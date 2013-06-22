@@ -27,6 +27,13 @@
           <ToolTipText>Get Redmine Tasks</ToolTipText>
         </Strings>
       </Button>
+      <Button guid="guidRedmineCmdSet" id="cmdidViewIssues" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Strings>
+          <ButtonText>RedmineIssueViewer</ButtonText>
+          <MenuText>Redmine Issue Viewer</MenuText>
+        </Strings>
+      </Button>
     </Buttons>
     <Bitmaps>
       <Bitmap guid="guidRedmineIcons" href="Resources\Icons.png" usedList="iconGetTasks"/>
@@ -44,6 +51,7 @@
     <GuidSymbol name="guidRedminePkg" value="{97535913-77a4-4d2a-ba30-6c4702d8ec5c}"/>
     <GuidSymbol name="guidRedmineCmdSet" value="{9c14cb93-71d4-4508-9135-d5486cc72147}">
       <IDSymbol name="cmdidGetTasks" value="0x0100"/>
+      <IDSymbol name="cmdidViewIssues" value="0x0101"/>
       <IDSymbol name="buttonGroup" value="0x1020"/>
       <IDSymbol name="taskListToolbar" value="0x1040"/>
       <IDSymbol name="toolbarGroup" value="0x1080"/>

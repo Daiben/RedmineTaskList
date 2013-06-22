@@ -9,11 +9,6 @@ namespace Redmine
     {
         private WebRequest _request;
 
-        public RedmineWebRequest(string username, string password, string requestUriString)
-        {
-            Initialize(username, password, new Uri(requestUriString));
-        }
-
         public RedmineWebRequest(string username, string password, Uri requestUri)
         {
             Initialize(username, password, requestUri);

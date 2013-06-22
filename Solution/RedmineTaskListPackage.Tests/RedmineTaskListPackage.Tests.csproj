@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F3FB77C5-35DF-4867-A09D-0EE91BEDE8B4}</ProjectGuid>
+    <ProjectGuid>{FDECC0F6-C0B1-44D1-94FC-C40641228631}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Redmine.Tests</RootNamespace>
-    <AssemblyName>Redmine.Tests</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>RedmineTaskListPackage.Tests</RootNamespace>
+    <AssemblyName>RedmineTaskListPackage.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartAction>Program</StartAction>
     <StartProgram>$(MSBuildProjectDirectory)\..\..\NUnit\nunit.exe</StartProgram>
@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <StartArguments>"$(MSBuildProjectDirectory)\$(OutputPath)$(AssemblyName).dll" /run</StartArguments>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <StartArguments>"$(MSBuildProjectDirectory)\$(OutputPath)$(AssemblyName).dll" /run</StartArguments>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -51,18 +53,17 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RedmineTaskListPackage\RedmineTaskListPackage.csproj">
+      <Project>{515a4cad-8156-4811-8734-ffb83fd5bf79}</Project>
+      <Name>RedmineTaskListPackage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Redmine\Redmine.csproj">
       <Project>{67428944-1e7e-4867-81c3-d31a35f888fe}</Project>
       <Name>Redmine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RedmineServiceTests.cs" />
-    <Compile Include="TestWebRequest.cs" />
-    <Compile Include="RedmineWebRequestTests.cs" />
-    <Compile Include="RedmineXmlParserTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="RedmineProjectTreeTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

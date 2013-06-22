@@ -9,9 +9,13 @@ namespace RedmineTaskListPackage
     public class RedmineTask : Task
     {
         private string issueUrl;
+        private RedmineIssue _issue;
+        private IRedmineIssueViewer _viewer;
 
-        public RedmineTask(PackageOptions options, RedmineIssue issue)
+        public RedmineTask(PackageOptions options, RedmineIssue issue, IRedmineIssueViewer viewer)
         {
+            _issue = issue;
+            _viewer = viewer;
             issueUrl = GetIssueUrl(options.URL, issue.Id);
 
             CanDelete = false;
@@ -57,7 +61,7 @@ namespace RedmineTaskListPackage
         {
             base.OnNavigate(e);
 
-            Process.Start(issueUrl);
+            _viewer.Show(_issue);
         }
 
         private static string GetIssueUrl(string baseUriString, int issueId)

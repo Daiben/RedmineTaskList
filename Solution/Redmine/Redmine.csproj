@@ -41,7 +41,7 @@
   <ItemGroup>
     <Compile Include="CertificateValidator.cs" />
     <Compile Include="RedmineResponseHeader.cs" />
-    <Compile Include="RedmineTaskList.cs" />
+    <Compile Include="RedmineService.cs" />
     <Compile Include="RedmineWebRequest.cs" />
     <Compile Include="RedmineIssue.cs" />
     <Compile Include="RedmineProject.cs" />

@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="RedmineTaskListPackage.IssueViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.11.0"
+             xmlns:local="clr-namespace:RedmineTaskListPackage.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="349.403" 
+             d:DesignWidth="490" 
+             d:DataContext="{d:DesignData Source=./DesignData/RedmineIssue.xaml}">
+
+    <UserControl.Resources>
+        <Style x:Key="env">
+            <!--<Setter Property="Control.Background" Value="{DynamicResource {x:Static vsui:EnvironmentColors.ToolWindowBackgroundBrushKey}}"/>-->
+            <!--<Setter Property="Control.Foreground" Value="{DynamicResource {x:Static vsui:EnvironmentColors.ToolWindowTextBrushKey}}"/>-->
+            <Setter Property="Control.Background" Value="#1e1e1e"/>
+            <Setter Property="Control.Foreground" Value="#e0e0e0"/>
+            <Setter Property="Control.FontSize" Value="14"/>
+        </Style>
+    </UserControl.Resources>
+
+    <UserControl.Style>
+        <Style BasedOn="{StaticResource env}" TargetType="UserControl">
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+    </UserControl.Style>
+
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top" FontSize="20" Margin="0,0,0,7">
+                <Hyperlink NavigateUri="{Binding Url}" Click="OpenInBrowser">
+                    <Run>
+                        <MultiBinding StringFormat="{}{0} #{1}">
+                            <Binding Path="TrackerName"/>
+                            <Binding Path="Id"/>
+                        </MultiBinding>
+                    </Run>
+                </Hyperlink>
+                <Run>
+                    <MultiBinding StringFormat="{} {0} ({1})">
+                        <Binding Path="Subject"/>
+                        <Binding Path="StatusName"/>
+                    </MultiBinding>
+                </Run>
+        </TextBlock>
+
+        <TextBlock DockPanel.Dock="Top" Margin="0,0,0,15">
+            <TextBlock.Text>
+                <MultiBinding  StringFormat="{}Created by {0} on {1:dd.MM.yy}. Updated on {2:dd.MM.yy}.">
+                    <Binding Path="AuthorName"/>
+                    <Binding Path="CreationTime"/>
+                    <Binding Path="LastUpdateTime"/>
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Status"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Priority"/>
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Assignee"/>
+
+            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding StatusName}"/>
+            <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding PriorityName}"/>
+            <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding AssigneeName}"/>
+
+            <TextBlock Grid.Column="2" Grid.Row="0" Text="Start Date"/>
+            <TextBlock Grid.Column="2" Grid.Row="1" Text="Due Date"/>
+            <TextBlock Grid.Column="2" Grid.Row="2" Text="% Done"/>
+
+            <TextBlock Grid.Column="3" Grid.Row="0" Text="{Binding StartDate, StringFormat={}{0:dd.MM.yy}}"/>
+            <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding DueDate, StringFormat={}{0:dd.MM.yy}}"/>
+            <WrapPanel Grid.Column="3" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" >
+                <ProgressBar Width="100" Height="14" Value="{Binding DoneRatio}"/>
+                <TextBlock Text="{Binding DoneRatio, StringFormat={}{0}%}" Margin="5,0,0,0"/>
+            </WrapPanel>
+        </Grid>
+        <TextBlock DockPanel.Dock="Top" Text="Description:" Margin="0,0,0,7"/>
+        <ScrollViewer Margin="15,0,0,0" VerticalScrollBarVisibility="Auto">
+            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

@@ -61,12 +61,30 @@ namespace RedmineTaskListPackage {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can not create window.
+        /// </summary>
+        internal static string CanNotCreateWindow {
+            get {
+                return ResourceManager.GetString("CanNotCreateWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Icons {
             get {
                 object obj = ResourceManager.GetObject("Icons", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redmine Issue Viewer.
+        /// </summary>
+        internal static string ToolWindowTitle {
+            get {
+                return ResourceManager.GetString("ToolWindowTitle", resourceCulture);
             }
         }
     }

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redmine", "Redmine\Redmine.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedmineTaskListPackage", "RedmineTaskListPackage\RedmineTaskListPackage.csproj", "{515A4CAD-8156-4811-8734-FFB83FD5BF79}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedmineTaskListPackage.Tests", "RedmineTaskListPackage.Tests\RedmineTaskListPackage.Tests.csproj", "{FDECC0F6-C0B1-44D1-94FC-C40641228631}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{515A4CAD-8156-4811-8734-FFB83FD5BF79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{515A4CAD-8156-4811-8734-FFB83FD5BF79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{515A4CAD-8156-4811-8734-FFB83FD5BF79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDECC0F6-C0B1-44D1-94FC-C40641228631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDECC0F6-C0B1-44D1-94FC-C40641228631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDECC0F6-C0B1-44D1-94FC-C40641228631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDECC0F6-C0B1-44D1-94FC-C40641228631}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
