@@ -39,6 +39,7 @@
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CertificateValidator.cs" />
     <Compile Include="RedmineResponseHeader.cs" />
     <Compile Include="RedmineTaskList.cs" />
     <Compile Include="RedmineWebRequest.cs" />

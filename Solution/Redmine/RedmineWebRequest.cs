@@ -29,9 +29,14 @@ namespace Redmine
 
         public string GetResponse()
         {
-            WebResponse response = _request.GetResponse();
+            var response = default(WebResponse);
+
+            using (CertificateValidator.NoValidation)
+            {
+                response = _request.GetResponse();
+            }
             
-            using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+            using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
             {
                 return reader.ReadToEnd();
             }
