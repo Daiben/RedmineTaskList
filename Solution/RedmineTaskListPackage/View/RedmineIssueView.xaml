@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="RedmineTaskListPackage.View.IssueView"
+﻿<UserControl x:Class="RedmineTaskListPackage.View.RedmineIssueView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -26,7 +26,7 @@
         </Style>
     </UserControl.Style>
 
-    <DockPanel>
+    <DockPanel MinHeight="160">
         <TextBlock DockPanel.Dock="Top" FontSize="20" Margin="0,0,0,7" TextTrimming="WordEllipsis">
                 <Hyperlink NavigateUri="{Binding Url}" Click="OpenInBrowser">
                     <Run>
