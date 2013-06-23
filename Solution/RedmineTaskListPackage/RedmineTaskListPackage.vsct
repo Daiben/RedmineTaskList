@@ -29,6 +29,7 @@
       </Button>
       <Button guid="guidRedmineCmdSet" id="cmdidViewIssues" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidRedmineIcons" id="iconViewIssues"/>
         <Strings>
           <ButtonText>RedmineIssueViewer</ButtonText>
           <MenuText>Redmine Issue Viewer</MenuText>
@@ -36,7 +37,7 @@
       </Button>
     </Buttons>
     <Bitmaps>
-      <Bitmap guid="guidRedmineIcons" href="Resources\Icons.png" usedList="iconGetTasks"/>
+      <Bitmap guid="guidRedmineIcons" href="Resources\Icons.png" usedList="iconViewIssues, iconGetTasks"/>
     </Bitmaps>
   </Commands>
   <CommandPlacements>
@@ -57,7 +58,8 @@
       <IDSymbol name="toolbarGroup" value="0x1080"/>
     </GuidSymbol>
     <GuidSymbol name="guidRedmineIcons" value="{573b1ba9-8443-4b6a-983d-88bbad7bed3d}">
-      <IDSymbol name="iconGetTasks" value="1"/>
+      <IDSymbol name="iconViewIssues" value="1"/>
+      <IDSymbol name="iconGetTasks" value="2"/>
     </GuidSymbol>
   </Symbols>
 </CommandTable>
