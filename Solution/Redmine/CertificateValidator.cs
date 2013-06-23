@@ -1,37 +1,28 @@
 ﻿using System;
-using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Redmine
 {
-    public abstract class CertificateValidator : IDisposable
+    public class CertificateValidator
     {
-        public static CertificateValidator NoValidation 
+        public static bool ValidateAny { get; set; }
+
+        public static string Thumbprint { get; set; }
+
+
+        public bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            get { return new CertificateValidatorStub(); }
+            return ValidateAny || CheckThumbprint(certificate); 
         }
 
-
-        protected CertificateValidator()
+        private static bool CheckThumbprint(X509Certificate certificate)
         {
-            ServicePointManager.ServerCertificateValidationCallback = ValidateCertificate;
-        }
+            var x509 = certificate as X509Certificate2;
 
-        public void Dispose()
-        {
-            ServicePointManager.ServerCertificateValidationCallback = null;
-        }
-
-        protected abstract bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors);
-
-
-        private class CertificateValidatorStub : CertificateValidator
-        {
-            protected override bool ValidateCertificate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
-            {
-                return true;
-            }
+            return !String.IsNullOrEmpty(Thumbprint) && 
+                x509 != null && 
+                x509.Thumbprint.Equals(Thumbprint.Replace(":", ""), StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

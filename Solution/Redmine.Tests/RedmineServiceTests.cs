@@ -169,7 +169,6 @@ namespace Redmine.Tests
             var request = MockRepository.GenerateMock<TestWebRequest>();
             var response = CreateResponseStub(responseXml);
             
-            request.Expect(x => x.Headers.Add("", "")).IgnoreArguments();
             request.Expect(x => x.GetResponse()).Return(response);
             
             WebRequest.RegisterPrefix("test", TestWebRequest.GetCreator(request));

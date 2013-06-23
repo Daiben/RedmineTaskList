@@ -19,16 +19,24 @@ namespace RedmineTaskListPackage
         public const string DefaultTaskDescriptionFormat = "#{0}\\t{4}\\t{13} ({6})";
 
         [Category("Authentication"), DefaultValue(DefaultLogin)]
-        [Description("Username used for authentication. Only issues assigned to this user will be requested.")]
+        [Description("Specifies username used for authentication.")]
         public string Username { get; set; }
         
         [Category("Authentication"), PasswordPropertyText(true)]
-        [Description("Password used for authentication.")]
+        [Description("Specifies password used for authentication.")]
         public string Password { get; set; }
         
         [Category("Redmine Server"), DefaultValue(DefaultUrl)]
-        [Description("Redmine server URL. (Please note that REST web service must be enabled).")]
+        [Description("Specifies redmine server URL. (Please note that REST web service must be enabled).")]
         public string URL { get; set; }
+
+        [Category("Redmine Server"), DefaultValue(false)]
+        [DisplayName("Validate Any Certificate"), Description("Specifies any certificate will be validated. To be used with care.")]
+        public bool ValidateAnyCertificate { get; set; }
+
+        [Category("Redmine Server"), DefaultValue("")]
+        [DisplayName("Certificate Thumbprint"), Description("Specifies certificate thumbprint that will be used for validation.")]
+        public string CertificateThumbprint { get; set; }
 
         [Category("Misc."), DefaultValue(false)]
         [DisplayName("Request on Startup"), Description("Specifies issues will be requested on startup.")]
@@ -61,6 +69,8 @@ namespace RedmineTaskListPackage
             Username = DefaultLogin;
             Password = DefaultLogin;
             URL = DefaultUrl;
+            ValidateAnyCertificate = false;
+            CertificateThumbprint = "";
             RequestOnStartup = false;
             Query = DefaultQuery;
             TaskDescriptionFormat = DefaultTaskDescriptionFormat;

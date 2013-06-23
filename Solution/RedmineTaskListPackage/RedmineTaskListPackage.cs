@@ -152,6 +152,9 @@ namespace RedmineTaskListPackage
 
             try
             {
+                CertificateValidator.ValidateAny = options.ValidateAnyCertificate;
+                CertificateValidator.Thumbprint = options.CertificateThumbprint;
+
                 var issues = RedmineService.GetIssues(options.Username, options.Password, options.URL, options.Query);
                 
                 OutputLine("Done");
