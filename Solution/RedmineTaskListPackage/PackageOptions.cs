@@ -15,7 +15,7 @@ namespace RedmineTaskListPackage
 
         public const string DefaultLogin = "admin";
         public const string DefaultUrl = "http://localhost:3000/";
-        public const string DefaultQuery = "assigned_to_id={0}";
+        public const string DefaultQuery = "assigned_to_id=me";
         public const string DefaultTaskDescriptionFormat = "#{0}\\t{4}\\t{13} ({6})";
 
         [Category("Authentication"), DefaultValue(DefaultLogin)]
@@ -43,7 +43,7 @@ namespace RedmineTaskListPackage
         public bool RequestOnStartup { get; set; }
 
         [Category("Query"), DefaultValue(DefaultQuery)]
-        [Description("Specifies query used in request. Default is \"assigned_to_id={0}\" where {0} stands for current user ID.")]
+        [Description("Specifies query used in request. Default is \"assigned_to_id=me\".")]
         public string Query { get; set; }
 
         [Category("Formatting"), DefaultValue(DefaultTaskDescriptionFormat)]
