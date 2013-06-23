@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 
 namespace RedmineTaskListPackage
@@ -98,9 +97,9 @@ namespace RedmineTaskListPackage
             return  options;
         }
 
-        private static Properties GetDteProperties(IServiceProvider provider)
+        private static EnvDTE.Properties GetDteProperties(IServiceProvider provider)
         {
-            var dte = (DTE)provider.GetService(typeof(DTE));
+            var dte = (EnvDTE.DTE)provider.GetService(typeof(EnvDTE.DTE));
             
             return dte.get_Properties(Category, Page);
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Shell;
 using Redmine;

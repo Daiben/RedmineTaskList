@@ -96,8 +96,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="IssueViewer.xaml.cs">
-      <DependentUpon>IssueViewer.xaml</DependentUpon>
+    <Compile Include="View\RedmineIssueView.xaml.cs">
+      <DependentUpon>RedmineIssueView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\ObservableObject.cs" />
     <Compile Include="ViewModel\RedmineIssueViewModel.cs" />
@@ -160,7 +160,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="IssueViewer.xaml">
+    <Page Include="View\RedmineIssueView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

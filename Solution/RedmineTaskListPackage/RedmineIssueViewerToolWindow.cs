@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Redmine;
+using RedmineTaskListPackage.View;
 using RedmineTaskListPackage.ViewModel;
 
 namespace RedmineTaskListPackage
@@ -11,12 +11,11 @@ namespace RedmineTaskListPackage
     [Guid("e17deb2b-3254-42f9-83cb-ad86d57afebd")]
     public class RedmineIssueViewerToolWindow : ToolWindowPane
     {
-        IssueViewer issueViewer;
+        RedmineIssueView issueViewer;
 
-        public RedmineIssueViewerToolWindow() :
-            base()
+        public RedmineIssueViewerToolWindow()
         {
-            issueViewer = new IssueViewer();
+            issueViewer = new RedmineIssueView();
 
             Caption = Resources.ToolWindowTitle;
             Content = issueViewer;

@@ -7,7 +7,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Redmine;
-using RedmineTaskListPackage.Tree;
 using RedmineTaskListPackage.ViewModel;
 
 namespace RedmineTaskListPackage
