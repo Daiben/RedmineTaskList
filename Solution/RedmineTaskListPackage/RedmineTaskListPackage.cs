@@ -76,13 +76,15 @@ namespace RedmineTaskListPackage
 
         private void GetTasksMenuItemCallback(object sender, EventArgs e)
         {
-            InitializeExplorerWindow();
+            InitializeIssueViewerWindow();
 
             RefreshTasksAsync(taskProvider.Show, ShowOutputPane);
         }
 
         private void ViewIssueMenuItemCallback(object sender, EventArgs e)
         {
+            InitializeIssueViewerWindow();
+            
             issueViewerWindow.Show();
         }
 
@@ -200,8 +202,13 @@ namespace RedmineTaskListPackage
             return GetOutputPane(VSConstants.SID_SVsGeneralOutputWindowPane, "Redmine");
         }
 
-        private void InitializeExplorerWindow()
+        private void InitializeIssueViewerWindow()
         {
+            if (issueViewerWindow != null)
+            {
+                return;
+            }
+
             issueViewerWindow = FindToolWindow(typeof(RedmineIssueViewerToolWindow), 0, true) as RedmineIssueViewerToolWindow;
 
             if (issueViewerWindow == null || issueViewerWindow.Frame == null)
@@ -224,10 +231,7 @@ namespace RedmineTaskListPackage
 
         private void ViewIssue(RedmineIssue issue)
         {
-            if (issueViewerWindow == null)
-            {
-                InitializeExplorerWindow();
-            }
+            InitializeIssueViewerWindow();
 
             issueViewerWindow.Show(new RedmineIssueViewModel(issue) {
                 WebBrowser = webBrowser
