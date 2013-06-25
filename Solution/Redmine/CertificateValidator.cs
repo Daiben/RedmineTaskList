@@ -10,6 +10,14 @@ namespace Redmine
 
         public static string Thumbprint { get; set; }
 
+        public static bool UseDefaultValidation
+        {
+            get
+            {
+                return !ValidateAny && String.IsNullOrEmpty(Thumbprint);
+            }
+        }
+
 
         public bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {

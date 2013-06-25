@@ -59,9 +59,11 @@ namespace Redmine
 
             public CertificateValidation()
             {
-                validator = new CertificateValidator();
-
-                ServicePointManager.ServerCertificateValidationCallback = validator.ValidateCertificate;
+                if (!CertificateValidator.UseDefaultValidation)
+                {
+                    validator = new CertificateValidator();
+                    ServicePointManager.ServerCertificateValidationCallback = validator.ValidateCertificate;
+                }
             }
 
             public void Dispose()
