@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
@@ -34,7 +35,7 @@ namespace RedmineTaskListPackage
         public bool ValidateAnyCertificate { get; set; }
 
         [Category("Redmine Server"), DefaultValue("")]
-        [DisplayName("Certificate Thumbprint"), Description("Specifies certificate thumbprint that will be used for validation.")]
+        [DisplayName("Certificate Thumbprint"), Description("Specifies certificate thumbprint used for validation.")]
         public string CertificateThumbprint { get; set; }
 
         [Category("Misc."), DefaultValue(false)]
@@ -57,6 +58,26 @@ namespace RedmineTaskListPackage
         [DisplayName("Open Tasks In Web Browser"), Description("Specifies double click on task opens web browser instead of issue viewer.")]
         public bool OpenTasksInWebBrowser { get; set; }
 
+        [Category("Proxy"), DefaultValue(ProxyOptions.Default)]
+        [DisplayName("Proxy Options"), Description("Specifies proxy options.")]
+        public ProxyOptions ProxyOptions { get; set; }
+
+        [Category("Proxy"), DefaultValue(ProxyOptions.Default)]
+        [DisplayName("Proxy Server"), Description("Specifies custom proxy server address.")]
+        public string ProxyServer { get; set; }
+
+        [Category("Proxy"), DefaultValue(ProxyOptions.Default)]
+        [DisplayName("Proxy Authentication"), Description("Specifies proxy authentication.")]
+        public ProxyOptions ProxyAuthentication { get; set; }
+
+        [Category("Proxy"), DefaultValue("")]
+        [DisplayName("Proxy Username"), Description("Specifies username used for proxy authentication.")]
+        public string ProxyUsername { get; set; }
+
+        [Category("Proxy"), PasswordPropertyText(true)]
+        [DisplayName("Proxy Password"), Description("Specifies password used for proxy authentication.")]
+        public string ProxyPassword { get; set; }
+
 
         public PackageOptions()
         {
@@ -75,6 +96,11 @@ namespace RedmineTaskListPackage
             TaskDescriptionFormat = DefaultTaskDescriptionFormat;
             UseInternalWebBrowser = false;
             OpenTasksInWebBrowser = false;
+            ProxyOptions = ProxyOptions.Default;
+            ProxyAuthentication = ProxyOptions.Default;
+            ProxyServer = "";
+            ProxyUsername = "";
+            ProxyPassword = "";
         }
 
         public override void ResetSettings()
@@ -82,6 +108,44 @@ namespace RedmineTaskListPackage
             base.ResetSettings();
             Initialize();
         }
+
+        public IWebProxy GetProxy()
+        {
+            IWebProxy proxy = null;
+
+            if (ProxyOptions == ProxyOptions.Default)
+            {
+                proxy = HttpWebRequest.DefaultWebProxy;
+            }
+            else if (ProxyOptions == ProxyOptions.Custom && !String.IsNullOrEmpty(ProxyServer))
+            {
+                proxy = GetCustomProxy();
+            }
+
+            return proxy;
+        }
+
+        private IWebProxy GetCustomProxy()
+        {
+            var uri = new Uri(ProxyServer);
+            var proxy = new WebProxy() {
+                Address = uri,
+            };
+
+            if (ProxyAuthentication == ProxyOptions.Custom)
+            {
+                var cache = new CredentialCache();
+                cache.Add(uri, "Basic", new NetworkCredential(ProxyUsername, ProxyPassword));
+                proxy.Credentials = cache;
+            }
+            else if (ProxyAuthentication == ProxyOptions.Default)
+            {
+                proxy.Credentials = CredentialCache.DefaultNetworkCredentials;
+            }
+
+            return proxy;
+        }
+
 
         public static PackageOptions GetOptions(IServiceProvider provider)
         {
@@ -103,6 +167,5 @@ namespace RedmineTaskListPackage
             
             return dte.get_Properties(Category, Page);
         }
-
     }
 }

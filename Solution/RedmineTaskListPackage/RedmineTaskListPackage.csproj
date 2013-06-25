@@ -85,6 +85,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProxyOptions.cs" />
     <Compile Include="WebBrowser.cs" />
     <Compile Include="IRedmineIssueViewer.cs" />
     <Compile Include="Tree\RedmineProjectTreeNodeCollection.cs" />

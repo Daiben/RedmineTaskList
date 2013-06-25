@@ -154,7 +154,7 @@ namespace RedmineTaskListPackage
             redmine.Username = options.Username;
             redmine.Password = options.Password;
             redmine.BaseUriString = options.URL;
-            //redmine.Proxy = options.GetProxy();
+            redmine.Proxy = options.GetProxy();
             
             CertificateValidator.ValidateAny = options.ValidateAnyCertificate;
             CertificateValidator.Thumbprint = options.CertificateThumbprint;
