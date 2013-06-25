@@ -1,27 +1,39 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 
 namespace Redmine
 {
-    public static class RedmineService
+    public class RedmineService
     {
-        public static RedmineIssue[] GetIssues(string username, string password, string baseUriString, string query="assigned_to_id=me")
-        {
-            var baseUri = new Uri(baseUriString);
+        public IWebProxy Proxy { get; set; }
 
-            var xml = GetXml(username, password, baseUri, String.Concat("issues.xml?", query));
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+        public Uri BaseUri { get; set; }
+
+        public string BaseUriString
+        {
+            get { return BaseUri.ToString(); }
+            set { BaseUri = new Uri(value); }
+        }
+
+
+        public RedmineService()
+        {
+            Proxy = WebRequest.DefaultWebProxy;
+        }
+
+        public RedmineIssue[] GetIssues(string query="assigned_to_id=me")
+        {
+            var xml = GetXml(String.Concat("issues.xml?", query));
             
             return RedmineXmlParser.ParseIssues(xml);
         }
 
-        public static RedmineProject[] GetProjects(string username, string password, string baseUriString)
-        {
-            var baseUri = new Uri(baseUriString);
-
-            return GetProjects(username, password, baseUri);
-        }
-
-        private static RedmineProject[] GetProjects(string username, string password, Uri baseUri)
+        public RedmineProject[] GetProjects()
         {
             var count = 1;
             var offset = 0;
@@ -29,7 +41,7 @@ namespace Redmine
 
             while (offset < count)
             {
-                var xml = GetXml(username, password, baseUri, "projects.xml", offset);
+                var xml = GetXml("projects.xml", offset);
                 var header = RedmineXmlParser.ParseHeader(xml);
 
                 projects = projects.Concat(RedmineXmlParser.ParseProjects(xml));
@@ -41,11 +53,11 @@ namespace Redmine
             return projects.ToArray();
         }
 
-        private static string GetXml(string username, string password, Uri baseUri, string path, int offset = 0)
+        private string GetXml(string path, int offset = 0)
         {
-            var uri = new Uri(baseUri, offset == 0 ? path : String.Concat(path, "?offset=", offset));
+            var uri = new Uri(BaseUri, offset == 0 ? path : String.Concat(path, "?offset=", offset));
 
-            var request = new RedmineWebRequest(username, password, uri);
+            var request = new RedmineWebRequest(Username, Password, uri, Proxy);
             
             return request.GetResponse();
         }

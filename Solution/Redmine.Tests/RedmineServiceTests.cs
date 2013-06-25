@@ -10,12 +10,24 @@ namespace Redmine.Tests
     [TestFixture]
     public class RedmineServiceTests
     {
+        RedmineService redmine;
+
+        [SetUp]
+        public void SetUp()
+        {
+            redmine = new RedmineService() {
+                Username = "lemon",
+                Password = "Pa$sw0rd",
+                BaseUriString = "test://redmine/",
+            };
+        }
+
         [Test]
         public void GetIssues()
         {
             var request = CreateRequestMock(issuesXml);
             
-            var issues = RedmineService.GetIssues("lemon", "Pa$sw0rd", "test://redmine/");
+            var issues = redmine.GetIssues();
 
             Assert.AreEqual(1, issues.Length);
             Assert.AreEqual("Parse Redmine API XML", issues[0].Subject);
@@ -27,7 +39,7 @@ namespace Redmine.Tests
             var request = CreateRequestMock(issuesXml);
             request.Expect(x => x.Create(new Uri("test://redmine/issues.xml?assigned_to_id=me"))).Repeat.Once();
             
-            RedmineService.GetIssues("lemon", "Pa$sw0rd", "test://redmine/");
+            redmine.GetIssues();
 
             request.VerifyAllExpectations();
         }
@@ -38,7 +50,7 @@ namespace Redmine.Tests
             var request = CreateRequestMock(issuesXml);
             request.Expect(x => x.Create(new Uri("test://redmine/issues.xml?assigned_to_id=me&limit=3"))).Repeat.Once();
             
-            RedmineService.GetIssues("lemon", "Pa$sw0rd", "test://redmine/", "assigned_to_id=me&limit=3");
+            redmine.GetIssues("assigned_to_id=me&limit=3");
 
             request.VerifyAllExpectations();
         }
@@ -49,7 +61,7 @@ namespace Redmine.Tests
         {
             var request = CreateRequestMock(projectsXml);
             
-            var projects = RedmineService.GetProjects("lemon", "Pa$sw0rd", "test://redmine/");
+            var projects = redmine.GetProjects();
 
             Assert.AreEqual(1, projects.Length);
             Assert.AreEqual("Redmine Task List", projects[0].Name);
@@ -61,7 +73,7 @@ namespace Redmine.Tests
             var request = CreateRequestMock(projectsXml);
             request.Expect(x => x.Create(new Uri("test://redmine/projects.xml"))).Repeat.Once();
             
-            RedmineService.GetProjects("lemon", "Pa$sw0rd", "test://redmine/");
+            redmine.GetProjects();
 
             request.VerifyAllExpectations();
         }
@@ -74,7 +86,7 @@ namespace Redmine.Tests
             request.Expect(x => x.Create(new Uri("test://redmine/projects.xml?offset=1"))).Repeat.Once();
             request.Expect(x => x.Create(new Uri("test://redmine/projects.xml?offset=2"))).Repeat.Once();
             
-            var projects = RedmineService.GetProjects("lemon", "Pa$sw0rd", "test://redmine/");
+            var projects = redmine.GetProjects();
 
             Assert.AreEqual(3, projects.Length);
             request.VerifyAllExpectations();

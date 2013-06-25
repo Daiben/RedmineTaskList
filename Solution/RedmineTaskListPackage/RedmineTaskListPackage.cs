@@ -25,6 +25,7 @@ namespace RedmineTaskListPackage
         private MenuCommand viewIssueMenuCommand;
         private RedmineIssueViewerToolWindow issueViewerWindow;
         private RedmineWebBrowser webBrowser;
+        private RedmineService redmine;
         private object syncRoot;
         private bool running;
 
@@ -39,8 +40,9 @@ namespace RedmineTaskListPackage
             var viewIssueCommandID = new CommandID(Guids.guidRedmineCmdSet, (int)CommandIDs.cmdidViewIssues);
             viewIssueMenuCommand = new MenuCommand(ViewIssueMenuItemCallback, viewIssueCommandID);
             
-            syncRoot = new object();
+            redmine = new RedmineService();
             webBrowser = new RedmineWebBrowser() { ServiceProvider = this };
+            syncRoot = new object();
         }
         
 
@@ -131,12 +133,12 @@ namespace RedmineTaskListPackage
             taskProvider.SuspendRefresh();
             taskProvider.Tasks.Clear();
 
+            var options = GetOptions();
+            ApplyOptions(options);
+
             try
             {
-                var options = GetOptions();
-                var issues = GetTasks(options);
-
-                foreach (var issue in issues)
+                foreach (var issue in GetIssues(options.Query))
                 {
                     taskProvider.Tasks.Add(new RedmineTask(options, issue, this as IRedmineIssueViewer));
                 }
@@ -147,26 +149,35 @@ namespace RedmineTaskListPackage
             }
         }
 
-        private RedmineIssue[] GetTasks(PackageOptions options)
+        private void ApplyOptions(PackageOptions options)
         {
-            OutputLine(String.Format("Retrieving issues from {0} as {1}...", options.URL, options.Username));
+            redmine.Username = options.Username;
+            redmine.Password = options.Password;
+            redmine.BaseUriString = options.URL;
+            //redmine.Proxy = options.GetProxy();
+            
+            CertificateValidator.ValidateAny = options.ValidateAnyCertificate;
+            CertificateValidator.Thumbprint = options.CertificateThumbprint;
+        }
+
+        private RedmineIssue[] GetIssues(string query)
+        {
+            var success = true;
+
+            OutputLine(String.Format("Retrieving issues from {0} as {1}...", redmine.BaseUri, redmine.Username));
 
             try
             {
-                CertificateValidator.ValidateAny = options.ValidateAnyCertificate;
-                CertificateValidator.Thumbprint = options.CertificateThumbprint;
-
-                var issues = RedmineService.GetIssues(options.Username, options.Password, options.URL, options.Query);
-                
-                OutputLine("Done");
-
-                return issues;
+                return redmine.GetIssues(query);
             }
             catch
             {
-                OutputLine("Error");
-
+                success = false;
                 throw;
+            }
+            finally
+            {
+                OutputLine(success ? "Done." : "Error.");
             }
         }
 
