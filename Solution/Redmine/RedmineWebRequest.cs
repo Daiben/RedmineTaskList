@@ -9,17 +9,18 @@ namespace Redmine
     {
         private WebRequest _request;
 
-        public RedmineWebRequest(string username, string password, Uri requestUri)
+        public RedmineWebRequest(string username, string password, Uri requestUri, IWebProxy proxy = null)
         {
-            Initialize(username, password, requestUri);
+            Initialize(username, password, requestUri, proxy);
         }
 
-        private void Initialize(string username, string password, Uri requestUri)
+        private void Initialize(string username, string password, Uri requestUri, IWebProxy proxy)
         {
             var cache = new CredentialCache();
             cache.Add(requestUri, "Basic", new NetworkCredential(username, password));
 
             _request = WebRequest.Create(requestUri);
+            _request.Proxy = proxy;
             _request.Credentials = cache;
         }
 

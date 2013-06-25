@@ -5,22 +5,36 @@ using System.Net.Security;
 using System.Text;
 using NUnit.Framework;
 using Rhino.Mocks;
+using Mocks = Rhino.Mocks.Constraints;
 
 namespace Redmine.Tests
 {
     [TestFixture]
     public class RedmineWebRequestTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            CertificateValidator.ValidateAny = false;
+            CertificateValidator.Thumbprint = "";
+        }
+
         [Test]
         public void GetResponse()
         {
             var request = CreateRequestMock();
-            
+            var proxy = MockRepository.GenerateStub<IWebProxy>();
+
             request.Expect(x => x.GetResponse()).Return(CreateResponseStub());
             request.Expect(x => x.Create(uri));
-            request.Expect(x => x.Credentials = null).IgnoreArguments(); // TODO: check credentials
+            request.Expect(x => x.Credentials = null).IgnoreArguments().Constraints(
+                Mocks.Is.Matching<CredentialCache>(x => {
+                    var credential = x.GetCredential(uri, "Basic");
+                    return credential.UserName == "lemon" && credential.Password == "Pa$sw0rd";
+                }));
+            request.Expect(x => x.Proxy = proxy);
 
-            var redmineRequest = new RedmineWebRequest("lemon", "Pa$sw0rd", uri);
+            var redmineRequest = new RedmineWebRequest("lemon", "Pa$sw0rd", uri, proxy);
             var result = redmineRequest.GetResponse();
 
             request.VerifyAllExpectations();
@@ -28,14 +42,41 @@ namespace Redmine.Tests
         }
 
         [Test]
-        public void GetResponse_CertificateValidationCallbackIsUsed()
+        public void GetResponse_NoExplicitSettings_NoCertificateValidationCallback()
+        {
+            var callbackUsedForRequest = GetCertificateValidationCallback();
+
+            Assert.IsNull(callbackUsedForRequest);
+        }
+
+        [Test]
+        public void GetResponse_ValidateAnyIsTrue_CertificateValidationCallbackIsUsed()
+        {
+            CertificateValidator.ValidateAny = true;
+
+            var callbackUsedForRequest = GetCertificateValidationCallback();
+
+            Assert.AreEqual(typeof(CertificateValidator).GetMethod("ValidateCertificate"),  callbackUsedForRequest.Method);
+            
+        }
+        [Test]
+        public void GetResponse_ThumbprintIsNotEmpty_CertificateValidationCallbackIsUsed()
+        {
+            CertificateValidator.Thumbprint = "Here's some fingerprint to check";
+
+            var callbackUsedForRequest = GetCertificateValidationCallback();
+
+            Assert.AreEqual(typeof(CertificateValidator).GetMethod("ValidateCertificate"),  callbackUsedForRequest.Method);
+        }
+
+        private RemoteCertificateValidationCallback GetCertificateValidationCallback()
         {
             var request = CreateRequestMock();
             var callbackUsedForRequest = default(RemoteCertificateValidationCallback);
-            request.Expect(x => x.GetResponse()).Do((Func<WebResponse>)(() => 
-            {
+
+            request.Expect(x => x.GetResponse()).Do((Func<WebResponse>)(() => {
                 callbackUsedForRequest = ServicePointManager.ServerCertificateValidationCallback;
-                
+
                 return CreateResponseStub();
             }));
 
@@ -43,11 +84,11 @@ namespace Redmine.Tests
             new RedmineWebRequest("lemon", "Pa$sw0rd", uri).GetResponse();
             var callbackUsedAfterRequest = ServicePointManager.ServerCertificateValidationCallback;
 
-            Assert.IsNotNull(callbackUsedForRequest);            
-            Assert.AreEqual(typeof(CertificateValidator), callbackUsedForRequest.Method.DeclaringType);
-            Assert.AreEqual("ValidateCertificate", callbackUsedForRequest.Method.Name);
             Assert.AreSame(callbackUsedBeforeRequest, callbackUsedAfterRequest);
+
+            return callbackUsedForRequest;
         }
+
 
         [Test]
         public void GetResponse_CustomAuthenticationIsUsed()
