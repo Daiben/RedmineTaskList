@@ -113,7 +113,7 @@ namespace RedmineTaskListPackage
                         }
                         catch (Exception e)
                         {
-                            Debug.WriteLine(e);
+                            OutputException(e);
                             callback = onFailure;
                         }
 
@@ -143,6 +143,11 @@ namespace RedmineTaskListPackage
                     taskProvider.Tasks.Add(new RedmineTask(options, issue, this as IRedmineIssueViewer));
                 }
             }
+            catch (Exception e)
+            {
+                OutputException(e);
+                throw;
+            }
             finally
             {
                 taskProvider.ResumeRefresh();
@@ -170,9 +175,10 @@ namespace RedmineTaskListPackage
             {
                 return redmine.GetIssues(query);
             }
-            catch
+            catch (Exception e)
             {
                 success = false;
+                OutputException(e);
                 throw;
             }
             finally
@@ -186,6 +192,15 @@ namespace RedmineTaskListPackage
             return PackageOptions.GetOptions(this);
         }
 
+        
+
+        private void OutputException(Exception e)
+        {
+            if (GetOptions().EnableDebugOutput)
+            {
+                OutputLine(e.ToString());
+            }
+        }
 
         private void OutputLine(string s)
         {

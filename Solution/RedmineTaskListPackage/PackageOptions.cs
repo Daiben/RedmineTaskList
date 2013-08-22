@@ -78,6 +78,10 @@ namespace RedmineTaskListPackage
         [DisplayName("Proxy Password"), Description("Specifies password used for proxy authentication.")]
         public string ProxyPassword { get; set; }
 
+        [Category("Debug"), DefaultValue(false)]
+        [DisplayName("Enable Debug Output"), Description("Specifies exception information is written to output.")]
+        public bool EnableDebugOutput { get; set; }
+
 
         public PackageOptions()
         {
@@ -101,6 +105,7 @@ namespace RedmineTaskListPackage
             ProxyServer = "";
             ProxyUsername = "";
             ProxyPassword = "";
+            EnableDebugOutput = false;
         }
 
         public override void ResetSettings()
