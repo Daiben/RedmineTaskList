@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -97,7 +98,7 @@ namespace Redmine
                     DueDate = GetDateTime(element, "due_date"),
 
                     DoneRatio = GetInt32(element, "done_ratio"),
-                    EstimatedHours = GetInt32(element, "estimated_hours"),
+                    EstimatedHours = GetDouble(element, "estimated_hours"),
                     
                     CreationTime = GetDateTime(element, "created_on"),
                     LastUpdateTime = GetDateTime(element, "updated_on"),
@@ -132,6 +133,11 @@ namespace Redmine
             return ParseInt32(GetString(element, descendantName, attributeName));
         }
 
+        private static double GetDouble(XElement element, string descendantName)
+        {
+            return ParseDouble(GetString(element, descendantName));
+        }
+
         private static DateTime GetDateTime(XElement element, string descendantName)
         {
             return ParseDateTime(GetString(element, descendantName));
@@ -140,12 +146,17 @@ namespace Redmine
 
         private static int ParseInt32(string s)
         {
-            return !String.IsNullOrEmpty(s) ? Int32.Parse(s) : 0;
+            return !String.IsNullOrEmpty(s) ? Int32.Parse(s, CultureInfo.InvariantCulture) : 0;
+        }
+
+        private static double ParseDouble(string s)
+        {
+            return !String.IsNullOrEmpty(s) ? Double.Parse(s, CultureInfo.InvariantCulture) : 0;
         }
 
         private static DateTime ParseDateTime(string s)
         {
-            return !String.IsNullOrEmpty(s) ? DateTime.Parse(s) : default(DateTime);
+            return !String.IsNullOrEmpty(s) ? DateTime.Parse(s, CultureInfo.InvariantCulture) : default(DateTime);
         }
     }
 }

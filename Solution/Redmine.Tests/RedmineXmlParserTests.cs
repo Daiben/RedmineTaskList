@@ -134,5 +134,17 @@ namespace Redmine.Tests
             Assert.AreEqual(default(DateTime), issue.DueDate);
             Assert.AreEqual(default(DateTime), issue.ClosingTime);
         }
+        
+
+        [Test]
+        public void ParseIssues_EstimatedHours()
+        {
+            var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><issues total_count=\"1\" offset=\"0\" limit=\"25\" type=\"array\"><issue><id>1</id><project id=\"2\" name=\"Redmine API Library\"/><tracker id=\"2\" name=\"Feature\"/><status id=\"3\" name=\"Resolved\"/><priority id=\"2\" name=\"Normal\"/><author id=\"1\" name=\"Dmitry Popov\"/><subject>Parse Redmine API XML</subject><description>Users, projects and issues</description><start_date></start_date><due_date></due_date><done_ratio></done_ratio><estimated_hours>1.5</estimated_hours><created_on>2013-06-13T22:10:24Z</created_on><updated_on>2013-06-13T22:10:24Z</updated_on><closed_on></closed_on></issue></issues>";
+
+            var issue = RedmineXmlParser.ParseIssues(xml)[0];
+            
+            Assert.AreEqual(0, issue.AssigneeId);
+            Assert.AreEqual(1.5, issue.EstimatedHours);
+        }
     }
 }

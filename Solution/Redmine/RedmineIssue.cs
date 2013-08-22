@@ -22,7 +22,7 @@ namespace Redmine
         public DateTime StartDate { get; set; }
         public DateTime DueDate { get; set; }
         public int DoneRatio { get; set; }
-        public int EstimatedHours { get; set; }
+        public double EstimatedHours { get; set; }
         public DateTime CreationTime { get; set; }
         public DateTime LastUpdateTime { get; set; }
         public DateTime ClosingTime { get; set; }
