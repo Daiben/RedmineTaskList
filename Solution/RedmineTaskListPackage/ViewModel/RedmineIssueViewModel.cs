@@ -124,7 +124,7 @@ namespace RedmineTaskListPackage.ViewModel
             }
         }
 
-        public int EstimatedHours
+        public double EstimatedHours
         {
             get { return _issue.EstimatedHours; }
             set
