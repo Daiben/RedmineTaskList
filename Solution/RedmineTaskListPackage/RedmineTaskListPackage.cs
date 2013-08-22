@@ -194,17 +194,14 @@ namespace RedmineTaskListPackage
 
         private void ShowOutputPane()
         {
-            if (!VsShellUtilities.ShellIsShuttingDown)
-            {
-                IUIService service = this.GetService(typeof(IUIService)) as IUIService;
-                
-                if (service != null)
-                {
-                    service.ShowToolWindow(new Guid(ToolWindowGuids.Outputwindow));
-                }
+            IUIService service = this.GetService(typeof(IUIService)) as IUIService;
 
-                GetOutputPane().Activate();
+            if (service != null)
+            {
+                service.ShowToolWindow(new Guid(ToolWindowGuids.Outputwindow));
             }
+
+            GetOutputPane().Activate();
         }
 
         private IVsOutputWindowPane GetOutputPane()

@@ -12,8 +12,8 @@
 
     <UserControl.Resources>
         <Style x:Key="env">
-            <Setter Property="Control.Background" Value="{DynamicResource {x:Static vsui:EnvironmentColors.ToolWindowBackgroundBrushKey}}"/>
-            <Setter Property="Control.Foreground" Value="{DynamicResource {x:Static vsui:EnvironmentColors.ToolWindowTextBrushKey}}"/>
+            <!--<Setter Property="Control.Background" Value="{DynamicResource {x:Static vsui:EnvironmentColors.ToolWindowBackgroundBrushKey}}"/>
+            <Setter Property="Control.Foreground" Value="{DynamicResource {x:Static vsui:EnvironmentColors.ToolWindowTextBrushKey}}"/>-->
             <!--<Setter Property="Control.Background" Value="#1e1e1e"/>-->
             <!--<Setter Property="Control.Foreground" Value="#e0e0e0"/>-->
             <Setter Property="Control.FontSize" Value="14"/>
