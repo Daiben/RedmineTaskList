@@ -18,68 +18,68 @@ namespace RedmineTaskListPackage
         public const string DefaultQuery = "assigned_to_id=me";
         public const string DefaultTaskDescriptionFormat = "#{0}\\t{4}\\t{13} ({6})";
 
-        [Category("Authentication"), DefaultValue(DefaultLogin)]
-        [Description("Specifies username used for authentication.")]
+        [Category(PackageStrings.Authentication), DefaultValue(DefaultLogin)]
+        [DisplayName(PackageStrings.Username), Description(PackageStrings.UsernameDescription)]
         public string Username { get; set; }
         
-        [Category("Authentication"), PasswordPropertyText(true)]
-        [Description("Specifies password used for authentication.")]
+        [Category(PackageStrings.Authentication), PasswordPropertyText(true)]
+        [DisplayName(PackageStrings.Password), Description(PackageStrings.PasswordDescription)]
         public string Password { get; set; }
         
-        [Category("Redmine Server"), DefaultValue(DefaultUrl)]
-        [Description("Specifies redmine server URL. (Please note that REST web service must be enabled).")]
+        [Category(PackageStrings.RedmineServer), DefaultValue(DefaultUrl)]
+        [DisplayName(PackageStrings.Url), Description(PackageStrings.UrlDescription)]
         public string URL { get; set; }
 
-        [Category("Redmine Server"), DefaultValue(false)]
-        [DisplayName("Validate Any Certificate"), Description("Specifies any certificate will be validated. To be used with care.")]
+        [Category(PackageStrings.RedmineServer), DefaultValue(false)]
+        [DisplayName(PackageStrings.ValidateAnyCertificate), Description(PackageStrings.ValidateAnyCertificateDescription)]
         public bool ValidateAnyCertificate { get; set; }
 
-        [Category("Redmine Server"), DefaultValue("")]
-        [DisplayName("Certificate Thumbprint"), Description("Specifies certificate thumbprint used for validation.")]
+        [Category(PackageStrings.RedmineServer), DefaultValue("")]
+        [DisplayName(PackageStrings.CertificateThumbprint), Description(PackageStrings.CertificateThumbprintDescription)]
         public string CertificateThumbprint { get; set; }
 
-        [Category("Misc."), DefaultValue(false)]
-        [DisplayName("Request on Startup"), Description("Specifies issues will be requested on startup.")]
+        [Category(PackageStrings.Misc), DefaultValue(false)]
+        [DisplayName(PackageStrings.RequestOnStartup), Description(PackageStrings.RequestOnStartupDescription)]
         public bool RequestOnStartup { get; set; }
 
-        [Category("Query"), DefaultValue(DefaultQuery)]
-        [Description("Specifies query used in request. Default is \"assigned_to_id=me\".")]
+        [Category(PackageStrings.Query), DefaultValue(DefaultQuery)]
+        [DisplayName(PackageStrings.Query), Description(PackageStrings.QueryDescription)]
         public string Query { get; set; }
 
-        [Category("Formatting"), DefaultValue(DefaultTaskDescriptionFormat)]
-        [DisplayName("Task Description Format"), Description("Specifies formatting used for task description. {0} - Id, {1} - ProjectId, {2} - ProjectName, {3} - TrackerId, {4} - TrackerName, {5} - StatusId, {6} - StatusName, {7} - PriorityId, {8} - PriorityName, {9} - AuthorId, {10} - AuthorName, {11} - AssigneeId, {12} - AssigneeName, {13} - Subject, {14} - Description, {15} - StartDate, {16} - DueDate, {17} - DoneRatio, {18} - EstimatedHours, {19} - CreationTime, {20} - LastUpdateTime, {21} - ClosingTime.")]
+        [Category(PackageStrings.Formatting), DefaultValue(DefaultTaskDescriptionFormat)]
+        [DisplayName(PackageStrings.TaskFormat), Description(PackageStrings.TaskFormatDescription)]
         public string TaskDescriptionFormat { get; set; }
 
-        [Category("Misc."), DefaultValue(false)]
-        [DisplayName("Use Internal Web Browser"), Description("Specifies links are opened in internal web browser.")]
+        [Category(PackageStrings.Misc), DefaultValue(false)]
+        [DisplayName(PackageStrings.UseInternalWebBrowser), Description(PackageStrings.UseInternalWebBrowserDescription)]
         public bool UseInternalWebBrowser { get; set; }
 
-        [Category("Misc."), DefaultValue(false)]
-        [DisplayName("Open Tasks In Web Browser"), Description("Specifies double click on task opens web browser instead of issue viewer.")]
+        [Category(PackageStrings.Misc), DefaultValue(false)]
+        [DisplayName(PackageStrings.OpenTasksInWebBrowser), Description(PackageStrings.OpenTasksInWebBrowserDescription)]
         public bool OpenTasksInWebBrowser { get; set; }
 
-        [Category("Proxy"), DefaultValue(ProxyOptions.Default)]
-        [DisplayName("Proxy Options"), Description("Specifies proxy options.")]
+        [Category(PackageStrings.Proxy), DefaultValue(ProxyOptions.Default)]
+        [DisplayName(PackageStrings.ProxyOptions), Description(PackageStrings.ProxyOptionsDescription)]
         public ProxyOptions ProxyOptions { get; set; }
 
-        [Category("Proxy"), DefaultValue(ProxyOptions.Default)]
-        [DisplayName("Proxy Server"), Description("Specifies custom proxy server address.")]
+        [Category(PackageStrings.Proxy), DefaultValue(ProxyOptions.Default)]
+        [DisplayName(PackageStrings.ProxyServer), Description(PackageStrings.ProxyServerDescription)]
         public string ProxyServer { get; set; }
 
-        [Category("Proxy"), DefaultValue(ProxyOptions.Default)]
-        [DisplayName("Proxy Authentication"), Description("Specifies proxy authentication.")]
+        [Category(PackageStrings.Proxy), DefaultValue(ProxyOptions.Default)]
+        [DisplayName(PackageStrings.ProxyAuthentication), Description(PackageStrings.ProxyAuthenticationDescription)]
         public ProxyOptions ProxyAuthentication { get; set; }
 
-        [Category("Proxy"), DefaultValue("")]
-        [DisplayName("Proxy Username"), Description("Specifies username used for proxy authentication.")]
+        [Category(PackageStrings.Proxy), DefaultValue("")]
+        [DisplayName(PackageStrings.ProxyUsername), Description(PackageStrings.ProxyUsernameDescription)]
         public string ProxyUsername { get; set; }
 
-        [Category("Proxy"), PasswordPropertyText(true)]
-        [DisplayName("Proxy Password"), Description("Specifies password used for proxy authentication.")]
+        [Category(PackageStrings.Proxy), PasswordPropertyText(true)]
+        [DisplayName(PackageStrings.ProxyPassword), Description(PackageStrings.ProxyPasswordDescription)]
         public string ProxyPassword { get; set; }
 
-        [Category("Debug"), DefaultValue(false)]
-        [DisplayName("Enable Debug Output"), Description("Specifies exception information is written to output.")]
+        [Category(PackageStrings.Debug), DefaultValue(false)]
+        [DisplayName(PackageStrings.EnableDebugOutput), Description(PackageStrings.EnableDebugOutputDescription)]
         public bool EnableDebugOutput { get; set; }
 
 
@@ -133,9 +133,7 @@ namespace RedmineTaskListPackage
         private IWebProxy GetCustomProxy()
         {
             var uri = new Uri(ProxyServer);
-            var proxy = new WebProxy() {
-                Address = uri,
-            };
+            var proxy = new WebProxy { Address = uri };
 
             if (ProxyAuthentication == ProxyOptions.Custom)
             {
