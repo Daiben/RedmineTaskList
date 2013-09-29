@@ -35,6 +35,13 @@
           <MenuText>Redmine Issue Viewer</MenuText>
         </Strings>
       </Button>
+      <Button guid="guidRedmineCmdSet" id="cmdidProjectSettings" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_START"/>
+        <Strings>
+          <ButtonText>RedmineSettings</ButtonText>
+          <MenuText>Redmine Settings...</MenuText>
+        </Strings>
+      </Button>
     </Buttons>
     <Bitmaps>
       <Bitmap guid="guidRedmineIcons" href="Resources\Icons.png" usedList="iconViewIssues, iconGetTasks"/>
@@ -53,6 +60,7 @@
     <GuidSymbol name="guidRedmineCmdSet" value="{9c14cb93-71d4-4508-9135-d5486cc72147}">
       <IDSymbol name="cmdidGetTasks" value="0x0100"/>
       <IDSymbol name="cmdidViewIssues" value="0x0101"/>
+      <IDSymbol name="cmdidProjectSettings" value="0x0102"/>
       <IDSymbol name="buttonGroup" value="0x1020"/>
       <IDSymbol name="taskListToolbar" value="0x1040"/>
       <IDSymbol name="toolbarGroup" value="0x1080"/>

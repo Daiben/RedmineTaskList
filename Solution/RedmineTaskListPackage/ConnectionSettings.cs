@@ -2,7 +2,7 @@
 
 namespace RedmineTaskListPackage
 {
-    public sealed class ConnectionSettings
+    public class ConnectionSettings
     {
         [DisplayName(PackageStrings.Url), Description(PackageStrings.UrlDescription)]
         public string URL { get; set; }

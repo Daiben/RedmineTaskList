@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -7,7 +8,9 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Redmine;
+using RedmineTaskListPackage.Forms;
 using RedmineTaskListPackage.ViewModel;
+using System.Windows.Forms;
 
 namespace RedmineTaskListPackage
 {
@@ -23,6 +26,7 @@ namespace RedmineTaskListPackage
         private RedmineTaskProvider taskProvider;
         private MenuCommand getTasksMenuCommand;
         private MenuCommand viewIssueMenuCommand;
+        private MenuCommand projectSettingsMenuCommand;
         private RedmineIssueViewerToolWindow issueViewerWindow;
         private RedmineWebBrowser webBrowser;
         private RedmineService redmine;
@@ -39,9 +43,12 @@ namespace RedmineTaskListPackage
             
             var viewIssueCommandID = new CommandID(Guids.guidRedmineCmdSet, (int)CommandIDs.cmdidViewIssues);
             viewIssueMenuCommand = new MenuCommand(ViewIssueMenuItemCallback, viewIssueCommandID);
+
+            var projectSettingsCommandID = new CommandID(Guids.guidRedmineCmdSet, (int)CommandIDs.cmdidProjectSettings);
+            projectSettingsMenuCommand = new MenuCommand(ProjectSettingsMenuItemCallback, projectSettingsCommandID);
             
             redmine = new RedmineService();
-            webBrowser = new RedmineWebBrowser() { ServiceProvider = this };
+            webBrowser = new RedmineWebBrowser { ServiceProvider = this };
             syncRoot = new object();
         }
         
@@ -72,6 +79,7 @@ namespace RedmineTaskListPackage
             {
                 menuCommandService.AddCommand(getTasksMenuCommand);
                 menuCommandService.AddCommand(viewIssueMenuCommand);
+                menuCommandService.AddCommand(projectSettingsMenuCommand);
             }
         }
 
@@ -89,6 +97,36 @@ namespace RedmineTaskListPackage
             issueViewerWindow.Show();
         }
 
+        private void ProjectSettingsMenuItemCallback(object sender, EventArgs e)
+        {
+            var project = GetSelectedProject() as EnvDTE.Project;
+
+            if (project == null)
+            {
+                return;
+            }
+
+            var storage = new ConnectionSettingsStorage(this, project.FullName);
+
+            var dialog = new ConnectionSettingsDialog
+            {
+                ConnectionSettings = storage.Load(),
+                StartPosition = FormStartPosition.CenterParent,
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                storage.Save(dialog.ConnectionSettings);
+            }
+        }
+
+        private object GetSelectedProject()
+        {
+            var dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+            var projects = dte.ActiveSolutionProjects as Array;
+
+            return projects.Length > 0 ? projects.GetValue(0) : null;
+        }
 
         private void InitializeTaskProvider()
         {
