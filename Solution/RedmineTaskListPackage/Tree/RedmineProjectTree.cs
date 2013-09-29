@@ -15,7 +15,8 @@ namespace RedmineTaskListPackage.Tree
         {
             foreach (var project in from x in projects where x.ParentId == node.Id select x)
             {
-                node.Nodes.Add(Fill(new RedmineProjectTreeNode() { 
+                node.Nodes.Add(Fill(new RedmineProjectTreeNode
+                { 
                     Id = project.Id, 
                     Name = project.Name
                 }, projects));

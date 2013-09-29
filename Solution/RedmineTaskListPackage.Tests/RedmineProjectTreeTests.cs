@@ -9,10 +9,11 @@ namespace RedmineTaskListPackage.Tree.Tests
         [Test]
         public void Create()
         {
-            var projects = new RedmineProject[] {
-                new RedmineProject() { Id = 1 },
-                new RedmineProject() { Id = 2, ParentId = 1 },
-                new RedmineProject() { Id = 3, ParentId = 2 }
+            var projects = new[]
+            {
+                new RedmineProject { Id = 1 },
+                new RedmineProject { Id = 2, ParentId = 1 },
+                new RedmineProject { Id = 3, ParentId = 2 }
             };
 
             var tree = RedmineProjectTree.Create(projects);

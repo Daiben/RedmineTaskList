@@ -12,7 +12,8 @@ namespace Redmine
         {
             var document = XDocument.Parse(xml);
 
-            return new RedmineResponseHeader() {
+            return new RedmineResponseHeader
+            {
                 Count = ParseInt32(document.Root.Attribute("total_count").Value),
                 Offset = ParseInt32(document.Root.Attribute("offset").Value),
                 Limit = ParseInt32(document.Root.Attribute("limit").Value),
@@ -26,7 +27,8 @@ namespace Redmine
             
             foreach (var element in document.Descendants("user"))
             {
-                users.Add(new RedmineUser() {
+                users.Add(new RedmineUser
+                {
                     Id = GetInt32(element, "id"),
 
                     Login = GetString(element, "login"),
@@ -49,7 +51,8 @@ namespace Redmine
             
             foreach (var element in document.Descendants("project"))
             {
-                projects.Add(new RedmineProject() {
+                projects.Add(new RedmineProject
+                {
                     Id = GetInt32(element, "id"),
 
                     Name = GetString(element, "name"),
@@ -74,7 +77,8 @@ namespace Redmine
             
             foreach (var element in document.Descendants("issue"))
             {
-                issues.Add(new RedmineIssue() {
+                issues.Add(new RedmineIssue
+                {
                     Id = GetInt32(element, "id"),
                     
                     ProjectId = GetInt32(element, "project", "id"),
@@ -111,14 +115,14 @@ namespace Redmine
 
         private static string GetString(XElement element, string descendantName)
         {
-            XElement descendantElement = element.Descendants(descendantName).FirstOrDefault();
+            var descendantElement = element.Descendants(descendantName).FirstOrDefault();
 
             return descendantElement != null ?  descendantElement.Value : "";
         }
 
         private static string GetString(XElement element, string descendantName, string attributeName)
         {
-            XElement descendantElement = element.Descendants(descendantName).FirstOrDefault();
+            var descendantElement = element.Descendants(descendantName).FirstOrDefault();
 
             return descendantElement != null ?  descendantElement.Attribute(attributeName).Value : "";
         }

@@ -15,7 +15,8 @@ namespace Redmine.Tests
         [SetUp]
         public void SetUp()
         {
-            redmine = new RedmineService() {
+            redmine = new RedmineService
+            {
                 Username = "lemon",
                 Password = "Pa$sw0rd",
                 BaseUriString = "test://redmine/",

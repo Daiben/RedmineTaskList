@@ -103,9 +103,9 @@ namespace RedmineTaskListPackage
                 if (!running)
                 {
                     running = true;
-                    Action action = new Action(RefreshTasks);
+                    var action = new Action(RefreshTasks);
                     action.BeginInvoke((AsyncCallback)(x => {
-                        Action callback = onSuccess;
+                        var callback = onSuccess;
 
                         try
                         {
@@ -209,11 +209,11 @@ namespace RedmineTaskListPackage
 
         private void ShowOutputPane()
         {
-            IUIService service = this.GetService(typeof(IUIService)) as IUIService;
+            var uiService = this.GetService(typeof(IUIService)) as IUIService;
 
-            if (service != null)
+            if (uiService != null)
             {
-                service.ShowToolWindow(new Guid(ToolWindowGuids.Outputwindow));
+                uiService.ShowToolWindow(new Guid(ToolWindowGuids.Outputwindow));
             }
 
             GetOutputPane().Activate();
@@ -255,7 +255,8 @@ namespace RedmineTaskListPackage
         {
             InitializeIssueViewerWindow();
 
-            issueViewerWindow.Show(new RedmineIssueViewModel(issue) {
+            issueViewerWindow.Show(new RedmineIssueViewModel(issue)
+            {
                 WebBrowser = webBrowser
             });
         }
