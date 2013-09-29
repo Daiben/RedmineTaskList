@@ -27,19 +27,24 @@ namespace RedmineTaskListPackage
             Open(issueUri.ToString(), options.UseInternalWebBrowser);
         }
 
-        public void Open(string url, bool useInternal)
+        private void Open(string url, bool useInternal)
         {
             if (useInternal)
             {
-                var browserService = ServiceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
-                IVsWindowFrame ppFrame;
-
-                ErrorHandler.ThrowOnFailure(browserService.Navigate(url, 0, out ppFrame));
+                OpenInternal(url);
             }
             else
             {
                 Process.Start(url);
             }
+        }
+
+        private void OpenInternal(string url)
+        {
+            var browserService = ServiceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
+            IVsWindowFrame ppFrame;
+
+            ErrorHandler.ThrowOnFailure(browserService.Navigate(url, 0, out ppFrame));
         }
     }
 }
