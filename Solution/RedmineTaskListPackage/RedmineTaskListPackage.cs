@@ -32,8 +32,8 @@ namespace RedmineTaskListPackage
         private RedmineService redmine;
         private object syncRoot;
         private bool running;
-
-    
+        private EnvDTE.SolutionEvents solutionEvents;
+            
 
 
         public RedmineTaskListPackage()
@@ -58,16 +58,37 @@ namespace RedmineTaskListPackage
             taskProvider.Dispose();
         }
 
+
         protected override void Initialize()
         {
             base.Initialize();
 
             InitializeTaskProvider();
             AddMenuCommands();
+            
+            var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
+            solutionEvents = dte.Events.SolutionEvents;
+
+            solutionEvents.Opened += AfterSolutionOpened;
+
 
             if (GetOptions().RequestOnStartup)
             {
                 RefreshTasksAsync();
+            }
+        }
+
+        void AfterSolutionOpened()
+        {
+            var dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+            var solution = dte.Solution;
+
+            for (int i = 1; i < solution.Projects.Count + 1; i++)
+            {
+                var project = solution.Projects.Item(i);
+                var storage = new ConnectionSettingsStorage(this, project.FullName);
+                var settings = storage.Load();
             }
         }
 

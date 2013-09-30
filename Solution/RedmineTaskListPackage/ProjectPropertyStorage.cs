@@ -6,6 +6,7 @@ namespace RedmineTaskListPackage
 {
     public class ProjectPropertyStorage
     {
+        private const uint storageType = (uint)_PersistStorageType.PST_USER_FILE;
         private IVsBuildPropertyStorage storage;
 
 
@@ -63,8 +64,9 @@ namespace RedmineTaskListPackage
 
         private int GetProjectProperty(string name, out string value)
         {
-            return storage.GetPropertyValue(name, "", (uint)_PersistStorageType.PST_PROJECT_FILE, out value);
+            return storage.GetPropertyValue(name, "", storageType, out value);
         }
+
 
 
         public void SetProperty(string name, string value)
@@ -74,7 +76,7 @@ namespace RedmineTaskListPackage
 
         private int SetProjectProperty(string name, string value)
         {
-            return storage.SetPropertyValue(name, "", (uint)_PersistStorageType.PST_PROJECT_FILE, value);
+            return storage.SetPropertyValue(name, "", storageType, value ?? "");
         }
     }
 }
