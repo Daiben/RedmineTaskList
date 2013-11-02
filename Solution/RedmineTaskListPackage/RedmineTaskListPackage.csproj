@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="ConnectionSettings.cs" />
     <Compile Include="ConnectionSettingsStorage.cs" />
+    <Compile Include="IDebug.cs" />
     <Compile Include="IssueLoader.cs" />
     <Compile Include="ProjectPropertyStorage.cs" />
     <Compile Include="PackageStrings.cs" />

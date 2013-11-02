@@ -20,7 +20,7 @@ namespace RedmineTaskListPackage
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)] 
     [Guid(Guids.guidRedminePkgString)]
-    public sealed class RedmineTaskListPackage : Package, IDisposable
+    public sealed class RedmineTaskListPackage : Package, IDisposable, IDebug
     {
         private RedmineTaskProvider taskProvider;
         private MenuCommand getTasksMenuCommand;
@@ -211,8 +211,12 @@ namespace RedmineTaskListPackage
 
             CertificateValidator.ValidateAny = options.ValidateAnyCertificate;
             CertificateValidator.Thumbprint = options.CertificateThumbprint;
-
-            var loader = new IssueLoader { Proxy = options.GetProxy() };
+            
+            var loader = new IssueLoader
+            {
+                Proxy = options.GetProxy(),
+                Debug = this as IDebug,
+            };
             
             return loader.LoadIssues(GetConnectionSettings());
         }
@@ -249,17 +253,17 @@ namespace RedmineTaskListPackage
         }
         
 
-        private void OutputException(Exception e)
+        void IDebug.WriteLine(string s)
         {
             if (GetOptions().EnableDebugOutput)
             {
-                OutputLine(e.ToString());
+                OutputLine(s);
             }
         }
 
         private void OutputLine(string s)
         {
-            GetOutputPane().OutputString(s + '\n');
+            GetOutputPane().OutputString(s + Environment.NewLine);
         }
 
         private void ShowOutputPane()

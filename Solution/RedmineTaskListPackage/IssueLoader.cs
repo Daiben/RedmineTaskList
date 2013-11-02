@@ -19,10 +19,14 @@ namespace RedmineTaskListPackage
             set { _proxy = value; }
         }
 
+        public IDebug Debug { get; set; }
+        
+
         public IssueLoader()
         {
             syncRoot = new object();
         }
+
 
         public RedmineIssue[] LoadIssues(IList<ConnectionSettings> settings)
         {
@@ -38,7 +42,7 @@ namespace RedmineTaskListPackage
 
         private void GetIssues(ConnectionSettings settings)
         {
-            RedmineIssue[] issues;
+            var issues = new RedmineIssue[0];
 
             var redmine = new RedmineService
             {
@@ -52,9 +56,13 @@ namespace RedmineTaskListPackage
             {
                 issues = redmine.GetIssues(settings.Query);
             }
-            catch
+            catch (Exception e)
             {
-                return;
+                if (Debug != null)
+                {
+                    Debug.WriteLine(String.Concat("Username: ", settings.Username, "; URL: ", redmine.BaseUriString, settings.Query));
+                    Debug.WriteLine(e.ToString());
+                }
             }
 
             lock (syncRoot)
