@@ -29,8 +29,13 @@ namespace RedmineTaskListPackage
         private RedmineIssueViewerToolWindow issueViewerWindow;
         private RedmineWebBrowser webBrowser;
         private object syncRoot;
-        private bool running;
+        private bool refreshing;
         private EnvDTE.SolutionEvents solutionEvents;
+
+        private PackageOptions Options
+        {
+            get { return PackageOptions.GetOptions(this); }
+        }
 
 
         public RedmineTaskListPackage()
@@ -68,7 +73,7 @@ namespace RedmineTaskListPackage
             solutionEvents.Opened += RefreshTasksAsync;
             solutionEvents.AfterClosing += RefreshTasksAsync;
 
-            if (GetOptions().RequestOnStartup)
+            if (Options.RequestOnStartup)
             {
                 RefreshTasksAsync();
             }
@@ -85,21 +90,23 @@ namespace RedmineTaskListPackage
 
         private void AddMenuCommands()
         {
-            var menuCommandService = GetService(typeof(IMenuCommandService)) as IMenuCommandService;
+            var menuService = GetService(typeof(IMenuCommandService)) as IMenuCommandService;
 
-            if (menuCommandService != null)
+            if (menuService == null)
             {
-                menuCommandService.AddCommand(getTasksMenuCommand);
-                menuCommandService.AddCommand(viewIssueMenuCommand);
-                menuCommandService.AddCommand(projectSettingsMenuCommand);
+                return;
             }
+
+            menuService.AddCommand(getTasksMenuCommand);
+            menuService.AddCommand(viewIssueMenuCommand);
+            menuService.AddCommand(projectSettingsMenuCommand);
         }
 
         private void GetTasksMenuItemCallback(object sender, EventArgs e)
         {
             InitializeIssueViewerWindow();
 
-            RefreshTasksAsync(taskProvider.Show, ShowOutputPane);
+            RefreshTasksAsync(taskProvider.Show);
         }
 
         private void ViewIssueMenuItemCallback(object sender, EventArgs e)
@@ -129,6 +136,7 @@ namespace RedmineTaskListPackage
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 storage.Save(dialog.ConnectionSettings);
+                RefreshTasksAsync();
             }
         }
 
@@ -149,38 +157,36 @@ namespace RedmineTaskListPackage
         
         private void RefreshTasksAsync()
         {
-            RefreshTasksAsync(null, null);
+            RefreshTasksAsync(null);
         }
-        
-        private void RefreshTasksAsync(Action onSuccess, Action onFailure)
+
+        private void RefreshTasksAsync(Action callback)
         {
             lock (syncRoot)
             {
-                if (!running)
-                {
-                    running = true;
-                    var action = new Action(RefreshTasks);
-                    action.BeginInvoke((AsyncCallback)(x => {
-                        var callback = onSuccess;
-                        
-                        try
-                        {
-                            action.EndInvoke(x);
-                        }
-                        catch
-                        {
-                            callback = onFailure;
-                        }
-
-                        if (callback != null)
-                        {
-                            callback.Invoke();
-                        }
-
-                        running = false; 
-                    }), null);
-                }
+                BeginRefreshTasks(callback);
             }
+        }
+
+        private void BeginRefreshTasks(Action callback)
+        {
+            if (refreshing)
+            {
+                return;
+            }
+                
+            refreshing = true;
+
+            var refresh = new Action(RefreshTasks);
+
+            callback = callback ?? (() => { });
+
+            refresh.BeginInvoke((AsyncCallback)(x => 
+            {
+                refresh.EndInvoke(x);
+                callback.Invoke();
+                refreshing = false;
+            }), null);
         }
 
         private void RefreshTasks()
@@ -192,14 +198,12 @@ namespace RedmineTaskListPackage
 
         private void PopulateTaskList(RedmineIssue[] issues)
         {
-            var options = GetOptions();
-            
             taskProvider.SuspendRefresh();
             taskProvider.Tasks.Clear();
 
             foreach (var issue in issues)
             {
-                taskProvider.Tasks.Add(CreateTask(issue, options.TaskDescriptionFormat));
+                taskProvider.Tasks.Add(CreateTask(issue, Options.TaskDescriptionFormat));
             }
          
             taskProvider.ResumeRefresh();
@@ -207,14 +211,12 @@ namespace RedmineTaskListPackage
 
         private RedmineIssue[] LoadIssues()
         {
-            var options = GetOptions();
+            CertificateValidator.ValidateAny = Options.ValidateAnyCertificate;
+            CertificateValidator.Thumbprint = Options.CertificateThumbprint;
 
-            CertificateValidator.ValidateAny = options.ValidateAnyCertificate;
-            CertificateValidator.Thumbprint = options.CertificateThumbprint;
-            
             var loader = new IssueLoader
-            {
-                Proxy = options.GetProxy(),
+            { 
+                Proxy = Options.GetProxy(),
                 Debug = this as IDebug,
             };
             
@@ -236,26 +238,18 @@ namespace RedmineTaskListPackage
                 settings.Add(storage.Load());
             }
 
-            var options = GetOptions();
-
-            if (options.RequestGlobal)
+            if (Options.RequestGlobal)
             {
-                settings.Insert(0, options.GetConnectionSettings());
+                settings.Insert(0, Options.GetConnectionSettings());
             }
 
             return settings.ToArray();
-        }
-
-
-        private PackageOptions GetOptions()
-        {
-            return PackageOptions.GetOptions(this);
         }
         
 
         void IDebug.WriteLine(string s)
         {
-            if (GetOptions().EnableDebugOutput)
+            if (Options.EnableDebugOutput)
             {
                 OutputLine(s);
             }
@@ -264,18 +258,6 @@ namespace RedmineTaskListPackage
         private void OutputLine(string s)
         {
             GetOutputPane().OutputString(s + Environment.NewLine);
-        }
-
-        private void ShowOutputPane()
-        {
-            var uiService = this.GetService(typeof(IUIService)) as IUIService;
-
-            if (uiService != null)
-            {
-                uiService.ShowToolWindow(new Guid(ToolWindowGuids.Outputwindow));
-            }
-
-            GetOutputPane().Activate();
         }
 
         private IVsOutputWindowPane GetOutputPane()
@@ -300,7 +282,7 @@ namespace RedmineTaskListPackage
 
         private void Show(RedmineIssue issue)
         {
-            if (GetOptions().OpenTasksInWebBrowser)
+            if (Options.OpenTasksInWebBrowser)
             {
                 webBrowser.Open(issue);
             }
