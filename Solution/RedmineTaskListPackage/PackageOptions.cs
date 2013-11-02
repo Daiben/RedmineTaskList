@@ -82,6 +82,10 @@ namespace RedmineTaskListPackage
         [DisplayName(PackageStrings.EnableDebugOutput), Description(PackageStrings.EnableDebugOutputDescription)]
         public bool EnableDebugOutput { get; set; }
 
+        [Category(PackageStrings.Misc), DefaultValue(true)]
+        [DisplayName(PackageStrings.RequestGlobal), Description(PackageStrings.RequestGlobalDescription)]
+        public bool RequestGlobal { get; set; }
+
 
         public PackageOptions()
         {
@@ -106,12 +110,26 @@ namespace RedmineTaskListPackage
             ProxyUsername = "";
             ProxyPassword = "";
             EnableDebugOutput = false;
+            RequestGlobal = true;
         }
 
         public override void ResetSettings()
         {
             base.ResetSettings();
             Initialize();
+        }
+
+        public ConnectionSettings GetConnectionSettings()
+        {
+            return new ConnectionSettings
+            {
+                URL = URL,
+                Query = Query,
+                Username = Username,
+                Password = Password,
+                CertificateThumbprint = CertificateThumbprint,
+                ValidateAnyCertificate = ValidateAnyCertificate,
+            };
         }
 
         public IWebProxy GetProxy()

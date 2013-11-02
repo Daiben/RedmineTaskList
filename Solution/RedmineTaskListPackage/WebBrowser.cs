@@ -19,17 +19,14 @@ namespace RedmineTaskListPackage
                 return;
             }
 
-            var options = PackageOptions.GetOptions(ServiceProvider);
-
-            var baseUri = new Uri(options.URL);
-            var issueUri = new Uri(baseUri, String.Concat("issues/", issue.Id));
-
-            Open(issueUri.ToString(), options.UseInternalWebBrowser);
+            Open(issue.Url);
         }
 
-        private void Open(string url, bool useInternal)
+        private void Open(string url)
         {
-            if (useInternal)
+            var options = PackageOptions.GetOptions(ServiceProvider);
+
+            if (options.UseInternalWebBrowser)
             {
                 OpenInternal(url);
             }

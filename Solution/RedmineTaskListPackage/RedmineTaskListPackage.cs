@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Redmine;
 using RedmineTaskListPackage.Forms;
 using RedmineTaskListPackage.ViewModel;
-using System.Windows.Forms;
 
 namespace RedmineTaskListPackage
 {
@@ -21,7 +20,7 @@ namespace RedmineTaskListPackage
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)] 
     [Guid(Guids.guidRedminePkgString)]
-    public sealed class RedmineTaskListPackage : Package, IDisposable, IRedmineIssueViewer
+    public sealed class RedmineTaskListPackage : Package, IDisposable
     {
         private RedmineTaskProvider taskProvider;
         private MenuCommand getTasksMenuCommand;
@@ -29,11 +28,9 @@ namespace RedmineTaskListPackage
         private MenuCommand projectSettingsMenuCommand;
         private RedmineIssueViewerToolWindow issueViewerWindow;
         private RedmineWebBrowser webBrowser;
-        private RedmineService redmine;
         private object syncRoot;
         private bool running;
         private EnvDTE.SolutionEvents solutionEvents;
-            
 
 
         public RedmineTaskListPackage()
@@ -47,7 +44,6 @@ namespace RedmineTaskListPackage
             var projectSettingsCommandID = new CommandID(Guids.guidRedmineCmdSet, (int)CommandIDs.cmdidProjectSettings);
             projectSettingsMenuCommand = new MenuCommand(ProjectSettingsMenuItemCallback, projectSettingsCommandID);
             
-            redmine = new RedmineService();
             webBrowser = new RedmineWebBrowser { ServiceProvider = this };
             syncRoot = new object();
         }
@@ -69,8 +65,8 @@ namespace RedmineTaskListPackage
             var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
             solutionEvents = dte.Events.SolutionEvents;
 
-            solutionEvents.Opened += AfterSolutionOpened;
-
+            solutionEvents.Opened += RefreshTasksAsync;
+            solutionEvents.AfterClosing += RefreshTasksAsync;
 
             if (GetOptions().RequestOnStartup)
             {
@@ -78,18 +74,13 @@ namespace RedmineTaskListPackage
             }
         }
 
-        void AfterSolutionOpened()
+        private RedmineTask CreateTask(RedmineIssue issue, string format)
         {
-            var dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+            var task = new RedmineTask(issue, format);
 
-            var solution = dte.Solution;
+            task.Navigate += (s, e) => Show(issue);
 
-            for (int i = 1; i < solution.Projects.Count + 1; i++)
-            {
-                var project = solution.Projects.Item(i);
-                var storage = new ConnectionSettingsStorage(this, project.FullName);
-                var settings = storage.Load();
-            }
+            return task;
         }
 
         private void AddMenuCommands()
@@ -155,7 +146,13 @@ namespace RedmineTaskListPackage
             taskProvider.Register();
         }
 
-        private void RefreshTasksAsync(Action onSuccess = null, Action onFailure = null)
+        
+        private void RefreshTasksAsync()
+        {
+            RefreshTasksAsync(null, null);
+        }
+        
+        private void RefreshTasksAsync(Action onSuccess, Action onFailure)
         {
             lock (syncRoot)
             {
@@ -165,14 +162,13 @@ namespace RedmineTaskListPackage
                     var action = new Action(RefreshTasks);
                     action.BeginInvoke((AsyncCallback)(x => {
                         var callback = onSuccess;
-
+                        
                         try
                         {
                             action.EndInvoke(x);
                         }
-                        catch (Exception e)
+                        catch
                         {
-                            OutputException(e);
                             callback = onFailure;
                         }
 
@@ -189,68 +185,68 @@ namespace RedmineTaskListPackage
 
         private void RefreshTasks()
         {
+            var issues = LoadIssues();
+
+            PopulateTaskList(issues);
+        }
+
+        private void PopulateTaskList(RedmineIssue[] issues)
+        {
+            var options = GetOptions();
+            
             taskProvider.SuspendRefresh();
             taskProvider.Tasks.Clear();
 
-            var options = GetOptions();
-            ApplyOptions(options);
-
-            try
+            foreach (var issue in issues)
             {
-                foreach (var issue in GetIssues(options.Query))
-                {
-                    taskProvider.Tasks.Add(new RedmineTask(options, issue, this as IRedmineIssueViewer));
-                }
+                taskProvider.Tasks.Add(CreateTask(issue, options.TaskDescriptionFormat));
             }
-            catch (Exception e)
-            {
-                OutputException(e);
-                throw;
-            }
-            finally
-            {
-                taskProvider.ResumeRefresh();
-            }
+         
+            taskProvider.ResumeRefresh();
         }
 
-        private void ApplyOptions(PackageOptions options)
+        private RedmineIssue[] LoadIssues()
         {
-            redmine.Username = options.Username;
-            redmine.Password = options.Password;
-            redmine.BaseUriString = options.URL;
-            redmine.Proxy = options.GetProxy();
-            
+            var options = GetOptions();
+
             CertificateValidator.ValidateAny = options.ValidateAnyCertificate;
             CertificateValidator.Thumbprint = options.CertificateThumbprint;
+
+            var loader = new IssueLoader { Proxy = options.GetProxy() };
+            
+            return loader.LoadIssues(GetConnectionSettings());
         }
 
-        private RedmineIssue[] GetIssues(string query)
+        private ConnectionSettings[] GetConnectionSettings()
         {
-            var success = true;
+            var dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
-            OutputLine(String.Format("Retrieving issues from {0} as {1}...", redmine.BaseUri, redmine.Username));
+            var solution = dte.Solution;
+            var settings = new List<ConnectionSettings>();
 
-            try
+            for (int i = 1; i < solution.Projects.Count + 1; i++)
             {
-                return redmine.GetIssues(query);
+                var project = solution.Projects.Item(i);
+                var storage = new ConnectionSettingsStorage(this, project.FullName);
+
+                settings.Add(storage.Load());
             }
-            catch (Exception e)
+
+            var options = GetOptions();
+
+            if (options.RequestGlobal)
             {
-                success = false;
-                OutputException(e);
-                throw;
+                settings.Insert(0, options.GetConnectionSettings());
             }
-            finally
-            {
-                OutputLine(success ? "Done." : "Error.");
-            }
+
+            return settings.ToArray();
         }
+
 
         private PackageOptions GetOptions()
         {
             return PackageOptions.GetOptions(this);
         }
-
         
 
         private void OutputException(Exception e)
@@ -298,7 +294,7 @@ namespace RedmineTaskListPackage
             }
         }
 
-        void IRedmineIssueViewer.Show(RedmineIssue issue)
+        private void Show(RedmineIssue issue)
         {
             if (GetOptions().OpenTasksInWebBrowser)
             {

@@ -40,5 +40,7 @@
         public const string ProxyUsernameDescription = "Specifies username used for proxy authentication.";
         public const string ProxyPasswordDescription = "Specifies password used for proxy authentication.";
         public const string EnableDebugOutputDescription = "Specifies exception information is written to output.";
+        public const string RequestGlobal = "Request Global";
+        public const string RequestGlobalDescription = "Specifies issues will be requested using global settings. Select false to to load issues using per project settings only.";
     }
 }

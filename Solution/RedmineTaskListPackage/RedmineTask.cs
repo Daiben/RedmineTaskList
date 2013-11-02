@@ -7,16 +7,8 @@ namespace RedmineTaskListPackage
 {
     public class RedmineTask : Task
     {
-        private string issueUrl;
-        private RedmineIssue _issue;
-        private IRedmineIssueViewer _viewer;
-
-        public RedmineTask(PackageOptions options, RedmineIssue issue, IRedmineIssueViewer viewer)
+        public RedmineTask(RedmineIssue issue, string format)
         {
-            _issue = issue;
-            _viewer = viewer;
-            issueUrl = GetIssueUrl(options.URL, issue.Id);
-
             CanDelete = false;
             Checked = false;
 
@@ -27,10 +19,11 @@ namespace RedmineTaskListPackage
             ImageIndex = 2;
 
             Category = TaskCategory.Misc;
+            Document = issue.ProjectName;
             Priority = (TaskPriority)Math.Max(3 - issue.PriorityId, 0);
 
-            Text = String.Format(
-                Regex.Unescape(options.TaskDescriptionFormat),
+            Text = String.Format
+               (Regex.Unescape(format),
                 issue.Id,
                 issue.ProjectId,
                 issue.ProjectName,
@@ -52,23 +45,7 @@ namespace RedmineTaskListPackage
                 issue.EstimatedHours,
                 issue.CreationTime,
                 issue.LastUpdateTime,
-                issue.ClosingTime
-             );
-        }
-
-        protected override void OnNavigate(EventArgs e)
-        {
-            base.OnNavigate(e);
-
-            _viewer.Show(_issue);
-        }
-
-        private static string GetIssueUrl(string baseUriString, int issueId)
-        {
-            var baseUri = new Uri(baseUriString);
-            var uri = new Uri(baseUri, String.Concat("issues/", issueId));
-            
-            return uri.ToString();
+                issue.ClosingTime);
         }
     }
 }
