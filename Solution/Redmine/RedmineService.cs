@@ -6,18 +6,45 @@ namespace Redmine
 {
     public class RedmineService
     {
+        private Uri _baseUri;
+
         public IWebProxy Proxy { get; set; }
 
         public string Username { get; set; }
 
         public string Password { get; set; }
 
-        public Uri BaseUri { get; set; }
+        public Uri BaseUri
+        {
+            get { return _baseUri; }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("BaseUri");
+                }
+
+                _baseUri = value;
+            }
+        }
 
         public string BaseUriString
         {
-            get { return BaseUri.ToString(); }
-            set { BaseUri = new Uri(value); }
+            get { return BaseUri != null ? BaseUri.ToString() : null; }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("BaseUriString");
+                }
+
+                if (value == "")
+                {
+                    throw new ArgumentException("Can't set BaseUriString to an empty string");
+                }
+
+                BaseUri = new Uri(value.Last() == '/' ? value : value + '/');
+            }
         }
 
 
@@ -28,13 +55,42 @@ namespace Redmine
 
         public RedmineIssue[] GetIssues(string query="assigned_to_id=me")
         {
+            if (BaseUri == null)
+            {
+                throw new InvalidOperationException("BaseUri is not set");
+            }
+
             var xml = GetXml(String.Concat("issues.xml?", query));
+            var issues = RedmineXmlParser.ParseIssues(xml);
+
+            foreach (var issue in issues)
+            {
+                issue.Url = GetIssueUrl(issue);
+            }
             
-            return RedmineXmlParser.ParseIssues(xml);
+            return issues;
+        }
+
+        private string GetIssueUrl(RedmineIssue issue)
+        {
+            var baseUri = BaseUriString;
+            var index = baseUri.IndexOf("projects");
+
+            if (index != -1)
+            {
+                baseUri = baseUri.Substring(0, index);
+            }
+
+            return String.Concat(baseUri, "issues/", issue.Id).ToString();
         }
 
         public RedmineProject[] GetProjects()
         {
+            if (BaseUri == null)
+            {
+                throw new InvalidOperationException("BaseUri is not set");
+            }
+
             var count = 1;
             var offset = 0;
             var projects = new RedmineProject[0].AsEnumerable();

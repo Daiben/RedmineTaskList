@@ -24,6 +24,43 @@ namespace Redmine.Tests
         }
 
         [Test]
+        public void BaseUri_SetNull_ThrowsArgumentNullException()
+        {
+            Assert.That(() => redmine.BaseUri = null, Throws.InstanceOf<ArgumentNullException>());
+        }
+
+
+        [Test]
+        public void BaseUriString_BaseUriIsNotSet_ReturnsNull()
+        {
+            redmine = new RedmineService();
+
+            Assert.IsNull(redmine.BaseUri);
+            Assert.IsNull(redmine.BaseUriString);
+        }
+
+        [Test]
+        public void BaseUriString_SetNull_ThrowsArgumentNullException()
+        {
+            Assert.That(() => redmine.BaseUriString = null, Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void BaseUriString_SetEmpty_ThrowsArgumentException()
+        {
+            Assert.That(() => redmine.BaseUriString = "", Throws.InstanceOf<ArgumentException>());
+        }
+
+        [Test]
+        public void BaseUriString_AppendsSlash()
+        {
+            redmine.BaseUriString = "test://redmine/project1";
+
+            Assert.AreEqual("test://redmine/project1/", redmine.BaseUriString);
+        }
+
+
+        [Test]
         public void GetIssues()
         {
             var request = CreateRequestMock(issuesXml);
@@ -35,7 +72,29 @@ namespace Redmine.Tests
         }
 
         [Test]
-        public void GetIssues_AssertUri()
+        public void GetIssues_Always_SetsIssueUrl()
+        {
+            var request = CreateRequestMock(issuesXml);
+            
+            var issues = redmine.GetIssues();
+
+            Assert.AreEqual("test://redmine/issues/1", issues[0].Url);
+        }
+
+        [Test]
+        public void GetIssues_ProjectSpecificRequest_SetsIssueUrl()
+        {
+            var request = CreateRequestMock(issuesXml);
+
+            redmine.BaseUriString += "projects/foo/";
+
+            var issues = redmine.GetIssues();
+
+            Assert.AreEqual("test://redmine/issues/1", issues[0].Url);
+        }
+
+        [Test]
+        public void GetIssues_NoArguments_SendsRequestToDefaultAddress()
         {
             var request = CreateRequestMock(issuesXml);
             request.Expect(x => x.Create(new Uri("test://redmine/issues.xml?assigned_to_id=me"))).Repeat.Once();
@@ -46,7 +105,7 @@ namespace Redmine.Tests
         }
 
         [Test]
-        public void GetIssues_AssertCustomQuery()
+        public void GetIssues_CustomQuery()
         {
             var request = CreateRequestMock(issuesXml);
             request.Expect(x => x.Create(new Uri("test://redmine/issues.xml?assigned_to_id=me&limit=3"))).Repeat.Once();
@@ -54,6 +113,15 @@ namespace Redmine.Tests
             redmine.GetIssues("assigned_to_id=me&limit=3");
 
             request.VerifyAllExpectations();
+        }
+
+        [Test]
+        public void GetIssues_BaseUriIsNotSet_ThrowsInvalidOperationException()
+        {
+            redmine = new RedmineService();
+
+            Assert.IsNull(redmine.BaseUri);
+            Assert.That(() => redmine.GetIssues(), Throws.InstanceOf<InvalidOperationException>());
         }
 
 
@@ -69,7 +137,7 @@ namespace Redmine.Tests
         }
 
         [Test]
-        public void GetProjects_AssertUri()
+        public void GetProjects_SendsRequestToDefaultAddress()
         {
             var request = CreateRequestMock(projectsXml);
             request.Expect(x => x.Create(new Uri("test://redmine/projects.xml"))).Repeat.Once();
@@ -80,7 +148,7 @@ namespace Redmine.Tests
         }
         
         [Test]
-        public void GetProjects_AssertAllAreRequested()
+        public void GetProjects_LimitIsLessThanCount_SeveralRequestsAreSent()
         {
             var request = CreateRequestMock(projectsXmlCount3Offset0Limit1, projectsXmlCount3Offset1Limit1, projectsXmlCount3Offset2Limit1);
             request.Expect(x => x.Create(new Uri("test://redmine/projects.xml"))).Repeat.Once();
@@ -91,6 +159,15 @@ namespace Redmine.Tests
 
             Assert.AreEqual(3, projects.Length);
             request.VerifyAllExpectations();
+        }
+
+        [Test]
+        public void GetProjects_BaseUriIsNotSet_ThrowsInvalidOperationException()
+        {
+            redmine = new RedmineService();
+
+            Assert.IsNull(redmine.BaseUri);
+            Assert.That(() => redmine.GetProjects(), Throws.InstanceOf<InvalidOperationException>());
         }
 
 
