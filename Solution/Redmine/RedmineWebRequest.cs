@@ -7,6 +7,8 @@ namespace Redmine
 {
     public class RedmineWebRequest
     {
+        private static readonly object syncRoot = new object();
+        
         private WebRequest _request;
 
         public RedmineWebRequest(string username, string password, Uri requestUri, IWebProxy proxy = null)
@@ -26,17 +28,38 @@ namespace Redmine
 
         public string GetResponse()
         {
-            var response = default(WebResponse);
+            lock (syncRoot) // Thread-safe access to System.Net static resources
+            {
+                return ReadToEnd(GetResponseStream());
+            }
+        }
 
+        private Stream GetResponseStream()
+        {
+            var response = ValidateCertificateAndGetResponse();
+
+            return response.GetResponseStream();
+        }
+
+        private WebResponse ValidateCertificateAndGetResponse()
+        {
             using (OwnCertificateValidation)
             {
-                using (OwnBasicAuthentication)
-                {
-                    response = _request.GetResponse();
-                }
+                return AuthenticateAndGetResponse();
             }
-            
-            using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+        }
+
+        private WebResponse AuthenticateAndGetResponse()
+        {
+            using (OwnBasicAuthentication)
+            {
+                return _request.GetResponse();
+            }
+        }
+
+        private string ReadToEnd(Stream stream)
+        {
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
                 return reader.ReadToEnd();
             }
