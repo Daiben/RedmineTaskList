@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -31,6 +31,7 @@ namespace RedmineTaskListPackage
         private object syncRoot;
         private bool refreshing;
         private EnvDTE.SolutionEvents solutionEvents;
+        private EnvDTE.WindowEvents windowEvents;
 
         private PackageOptions Options
         {
@@ -69,9 +70,10 @@ namespace RedmineTaskListPackage
             
             var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
             solutionEvents = dte.Events.SolutionEvents;
+            windowEvents = dte.Events.WindowEvents;
 
             solutionEvents.Opened += RefreshTasksAsync;
-            solutionEvents.AfterClosing += RefreshTasksAsync;
+            solutionEvents.AfterClosing += () => taskProvider.Tasks.Clear();
 
             if (Options.RequestOnStartup)
             {
@@ -243,7 +245,7 @@ namespace RedmineTaskListPackage
                 settings.Insert(0, Options.GetConnectionSettings());
             }
 
-            return settings.ToArray();
+            return settings.Where(x => x.IsValid()).ToArray();
         }
         
 

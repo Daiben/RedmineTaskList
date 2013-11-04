@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace RedmineTaskListPackage
 {
@@ -27,5 +28,11 @@ namespace RedmineTaskListPackage
         [Category(PackageStrings.RedmineServer)]
         [DisplayName(PackageStrings.CertificateThumbprint), Description(PackageStrings.CertificateThumbprintDescription)]
         public string CertificateThumbprint { get; set; }
+
+
+        public bool IsValid()
+        {
+            return !String.IsNullOrEmpty(URL);
+        }
     }
 }
