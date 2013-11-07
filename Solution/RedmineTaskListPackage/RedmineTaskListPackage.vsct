@@ -37,6 +37,7 @@
       </Button>
       <Button guid="guidRedmineCmdSet" id="cmdidProjectSettings" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_START"/>
+        <Icon guid="guidRedmineIcons" id="iconViewIssues"/>
         <Strings>
           <ButtonText>RedmineProjectSettings</ButtonText>
           <MenuText>Redmine Settings...</MenuText>
