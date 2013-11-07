@@ -227,25 +227,53 @@ namespace RedmineTaskListPackage
 
         private ConnectionSettings[] GetConnectionSettings()
         {
-            var dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
-            var solution = dte.Solution;
-            var settings = new List<ConnectionSettings>();
-
-            for (int i = 1; i < solution.Projects.Count + 1; i++)
-            {
-                var project = solution.Projects.Item(i);
-                var storage = new ConnectionSettingsStorage(this, project.FullName);
-
-                settings.Add(storage.Load());
-            }
+            var settings = GetProjectConnectionSettings();
 
             if (Options.RequestGlobal)
             {
                 settings.Insert(0, Options.GetConnectionSettings());
             }
 
-            return settings.Where(x => x.IsValid()).ToArray();
+            return settings.ToArray();
+        }
+
+        private List<ConnectionSettings> GetProjectConnectionSettings()
+        {
+            var dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+            return dte.Solution.Projects.Cast<EnvDTE.Project>()
+                .Select(LoadConectionSettings).Where(x => x != null).ToList();
+        }
+
+        private ConnectionSettings LoadConectionSettings(EnvDTE.Project project)
+        {
+            var fullName = "";
+
+            return TryGetProjectFullName(project, out fullName) ? LoadConnectionSettings(fullName) : null;
+        }
+
+        private ConnectionSettings LoadConnectionSettings(string projectPath)
+        {
+            var storage = new ConnectionSettingsStorage(this as IServiceProvider, projectPath);
+
+            return storage.Load();
+        }
+
+        private bool TryGetProjectFullName(EnvDTE.Project project, out string fullName)
+        {
+            var result = true;
+            fullName = null;
+
+            try
+            {
+                fullName = project.FullName;
+            }
+            catch (NotImplementedException)
+            {
+                result = false;
+            }
+
+            return result;
         }
         
 

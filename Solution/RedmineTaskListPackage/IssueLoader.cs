@@ -32,12 +32,17 @@ namespace RedmineTaskListPackage
         {
             _issues = new Dictionary<ConnectionSettings, RedmineIssue[]>();
 
-            Parallel.ForEach(settings, GetIssues);
+            Parallel.ForEach(settings.Where(IsValid), GetIssues);
 
             return _issues.OrderBy(x => settings.IndexOf(x.Key))
                 .SelectMany(x => x.Value)
                 .Distinct(new IssueComparer())
                 .ToArray();
+        }
+
+        private bool IsValid(ConnectionSettings settings)
+        {
+            return !String.IsNullOrEmpty(settings.URL);
         }
 
         private void GetIssues(ConnectionSettings settings)
