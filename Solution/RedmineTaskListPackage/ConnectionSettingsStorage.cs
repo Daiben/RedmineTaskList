@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Shell.Interop;
+using System;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,12 +9,14 @@ namespace RedmineTaskListPackage
     public class ConnectionSettingsStorage
     {
         private static byte[] entropy = { 1, 6, 3, 0, 4, 5 };
-        private ProjectPropertyStorage storage;
+        private ProjectPropertyStorage _storage;
 
-        public ConnectionSettingsStorage(IServiceProvider provider, string projectPath)
+
+        public ConnectionSettingsStorage(IVsBuildPropertyStorage storage)
         {
-            storage = new ProjectPropertyStorage(provider, projectPath);
+            _storage = new ProjectPropertyStorage(storage);
         }
+
 
         public ConnectionSettings Load()
         {
@@ -50,7 +53,7 @@ namespace RedmineTaskListPackage
         {
             string value;
 
-            storage.TryGetProperty(name, out value);
+            _storage.TryGetProperty(name, out value);
 
             return value;
         }
@@ -69,7 +72,7 @@ namespace RedmineTaskListPackage
         {
             string value;
 
-            if (storage.TryGetProperty(name, out value))
+            if (_storage.TryGetProperty(name, out value))
             {
                 value = TryUnprotect(value);
             }
@@ -92,7 +95,7 @@ namespace RedmineTaskListPackage
 
         private void SetProperty(string name, string value)
         {
-            storage.SetProperty(name, value);
+            _storage.SetProperty(name, value);
         }
 
         private void SetProperty(string name, bool value)

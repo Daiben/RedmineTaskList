@@ -121,14 +121,13 @@ namespace RedmineTaskListPackage
         private void ProjectSettingsMenuItemCallback(object sender, EventArgs e)
         {
             var project = GetSelectedProject() as EnvDTE.Project;
+            var storage = GetConnectionSettingsStorage(project);
 
-            if (project == null)
+            if (storage == null)
             {
                 return;
             }
-
-            var storage = new ConnectionSettingsStorage(this, project.FullName);
-
+            
             var dialog = new ConnectionSettingsDialog
             {
                 ConnectionSettings = storage.Load(),
@@ -141,6 +140,7 @@ namespace RedmineTaskListPackage
                 RefreshTasksAsync();
             }
         }
+
 
         private object GetSelectedProject()
         {
@@ -245,18 +245,46 @@ namespace RedmineTaskListPackage
                 .Select(LoadConectionSettings).Where(x => x != null).ToList();
         }
 
+
         private ConnectionSettings LoadConectionSettings(EnvDTE.Project project)
         {
-            var fullName = "";
+            var storage = GetConnectionSettingsStorage(project);
 
-            return TryGetProjectFullName(project, out fullName) ? LoadConnectionSettings(fullName) : null;
+            return storage != null ? storage.Load() : null;
         }
 
-        private ConnectionSettings LoadConnectionSettings(string projectPath)
+        private ConnectionSettingsStorage GetConnectionSettingsStorage(EnvDTE.Project project)
         {
-            var storage = new ConnectionSettingsStorage(this as IServiceProvider, projectPath);
+            var projectPath = "";
 
-            return storage.Load();
+            if (project == null || !TryGetProjectFullName(project, out projectPath))
+            {
+                return null;
+            }
+
+            return GetConnectionSettingsStorage(projectPath);
+        }
+
+        private ConnectionSettingsStorage GetConnectionSettingsStorage(string projectPath)
+        {
+            var propertyStorage = GetPropertyStorage(projectPath);
+
+            if (propertyStorage == null)
+            {
+                return null;
+            }
+
+            return new ConnectionSettingsStorage(propertyStorage);
+        }
+
+        private IVsBuildPropertyStorage GetPropertyStorage(string projectPath)
+        {
+            var solution = GetService(typeof(SVsSolution)) as IVsSolution;
+            var hierarchy = default(IVsHierarchy);
+
+            solution.GetProjectOfUniqueName(projectPath, out hierarchy);
+
+            return hierarchy as IVsBuildPropertyStorage;
         }
 
         private bool TryGetProjectFullName(EnvDTE.Project project, out string fullName)
@@ -268,13 +296,15 @@ namespace RedmineTaskListPackage
             {
                 fullName = project.FullName;
             }
-            catch (NotImplementedException)
+            catch
             {
                 result = false;
             }
 
             return result;
         }
+
+        
         
 
         void IDebug.WriteLine(string s)

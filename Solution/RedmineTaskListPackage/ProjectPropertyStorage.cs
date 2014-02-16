@@ -1,38 +1,22 @@
-﻿using System;
-using Microsoft.VisualStudio;
+﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
+using System;
 
 namespace RedmineTaskListPackage
 {
     public class ProjectPropertyStorage
     {
         private const uint storageType = (uint)_PersistStorageType.PST_USER_FILE;
-        private IVsBuildPropertyStorage storage;
+        private IVsBuildPropertyStorage _storage;
 
-
-        public ProjectPropertyStorage(IServiceProvider provider, string projectPath)
+        public ProjectPropertyStorage(IVsBuildPropertyStorage storage)
         {
-            if (provider == null)
+            if (storage == null)
             {
-                throw new ArgumentNullException("provider");
+                throw new ArgumentNullException("storage");
             }
 
-            if (projectPath == null)
-            {
-                throw new ArgumentNullException("projectPath");
-            }
-
-            storage = GetPropertyStorage(provider, projectPath);
-        }
-
-        private static IVsBuildPropertyStorage GetPropertyStorage(IServiceProvider provider, string projectPath)
-        {
-            var solution = provider.GetService(typeof(SVsSolution)) as IVsSolution;
-            var hierarchy = default(IVsHierarchy);
-
-            solution.GetProjectOfUniqueName(projectPath, out hierarchy);
-
-            return (IVsBuildPropertyStorage)hierarchy;
+            _storage = storage;
         }
 
 
@@ -64,9 +48,8 @@ namespace RedmineTaskListPackage
 
         private int GetProjectProperty(string name, out string value)
         {
-            return storage.GetPropertyValue(name, "", storageType, out value);
+            return _storage.GetPropertyValue(name, "", storageType, out value);
         }
-
 
 
         public void SetProperty(string name, string value)
@@ -76,7 +59,7 @@ namespace RedmineTaskListPackage
 
         private int SetProjectProperty(string name, string value)
         {
-            return storage.SetPropertyValue(name, "", storageType, value ?? "");
+            return _storage.SetPropertyValue(name, "", storageType, value ?? "");
         }
     }
 }
