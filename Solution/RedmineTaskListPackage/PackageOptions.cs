@@ -168,6 +168,19 @@ namespace RedmineTaskListPackage
         }
 
 
+        protected override void OnApply(DialogPage.PageApplyEventArgs e)
+        {
+            base.OnApply(e);
+
+            if (e.ApplyBehavior == ApplyKind.Apply)
+            {
+                Applied(this, EventArgs.Empty);
+            }
+        }
+
+        public static event EventHandler Applied = (s, e) => { };
+
+
         public static PackageOptions GetOptions(IServiceProvider provider)
         {
             var options = new PackageOptions();

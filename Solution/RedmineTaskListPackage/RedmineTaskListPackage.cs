@@ -32,6 +32,7 @@ namespace RedmineTaskListPackage
         private bool refreshing;
         private EnvDTE.SolutionEvents solutionEvents;
         private EnvDTE.WindowEvents windowEvents;
+        private RedmineIssue[] _currentIssues;
 
         private PackageOptions Options
         {
@@ -75,10 +76,17 @@ namespace RedmineTaskListPackage
             solutionEvents.Opened += RefreshTasksAsync;
             solutionEvents.AfterClosing += () => taskProvider.Tasks.Clear();
 
+            PackageOptions.Applied += (s, e) => OnPackageOptionsApplied();
+
             if (Options.RequestOnStartup)
             {
                 RefreshTasksAsync();
             }
+        }
+
+        private void OnPackageOptionsApplied()
+        {
+            PopulateTaskList(_currentIssues);
         }
 
         private RedmineTask CreateTask(RedmineIssue issue, string format)
@@ -200,10 +208,12 @@ namespace RedmineTaskListPackage
 
         private void PopulateTaskList(RedmineIssue[] issues)
         {
+            _currentIssues = issues;
+
             taskProvider.SuspendRefresh();
             taskProvider.Tasks.Clear();
 
-            foreach (var issue in issues)
+            foreach (var issue in issues ?? new RedmineIssue[0])
             {
                 taskProvider.Tasks.Add(CreateTask(issue, Options.TaskDescriptionFormat));
             }
