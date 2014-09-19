@@ -160,6 +160,8 @@ namespace Redmine
 
         private static DateTime ParseDateTime(string s)
         {
+            s = s.Replace("UTC", ""); // "UTC" causes FormatException (when not ISO 8601)
+
             return !String.IsNullOrEmpty(s) ? DateTime.Parse(s, CultureInfo.InvariantCulture) : default(DateTime);
         }
     }
