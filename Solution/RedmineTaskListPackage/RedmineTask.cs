@@ -20,6 +20,7 @@ namespace RedmineTaskListPackage
 
             Category = TaskCategory.Misc;
             Document = issue.ProjectName;
+            Line = issue.Id;
             Priority = (TaskPriority)Math.Max(3 - issue.PriorityId, 0);
 
             Text = String.Format
