@@ -20,7 +20,10 @@ namespace RedmineTaskListPackage
 
             Category = TaskCategory.Misc;
             Document = issue.ProjectName;
-            Line = issue.Id;
+            
+            // Visual Studio shows line numbers incremented by 1
+            Line = issue.Id - 1;
+            
             Priority = (TaskPriority)Math.Max(3 - issue.PriorityId, 0);
             Text = GetFormattedDescription(issue, format);
         }

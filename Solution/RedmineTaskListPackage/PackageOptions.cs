@@ -16,7 +16,7 @@ namespace RedmineTaskListPackage
         public const string DefaultLogin = "admin";
         public const string DefaultUrl = "http://localhost:3000/";
         public const string DefaultQuery = "assigned_to_id=me";
-        public const string DefaultTaskDescriptionFormat = "#{0}\\t{4}\\t{13} ({6})";
+        public const string DefaultTaskDescriptionFormat = "{4}\\t{13} ({6})";
 
         [Category(PackageStrings.Authentication), DefaultValue(DefaultLogin)]
         [DisplayName(PackageStrings.Username), Description(PackageStrings.UsernameDescription)]
