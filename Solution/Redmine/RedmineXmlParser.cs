@@ -98,8 +98,8 @@ namespace Redmine
                     Subject = GetString(element, "subject"),
                     Description = GetString(element, "description"),
 
-                    StartDate = GetDateTime(element, "start_date"),
-                    DueDate = GetDateTime(element, "due_date"),
+                    StartDate = GetDateTime(element, "start_date").Date,
+                    DueDate = GetDateTime(element, "due_date").Date,
 
                     DoneRatio = GetInt32(element, "done_ratio"),
                     EstimatedHours = GetDouble(element, "estimated_hours"),
@@ -160,9 +160,14 @@ namespace Redmine
 
         private static DateTime ParseDateTime(string s)
         {
-            s = s.Replace("UTC", ""); // "UTC" causes FormatException (when not ISO 8601)
+            var formats = new[]
+            {
+                "yyyy-MM-dd",
+                "yyyy-MM-ddTHH:mm:ssZ",
+                "yyyy-MM-dd HH:mm:ss.fff UTC",
+            };
 
-            return !String.IsNullOrEmpty(s) ? DateTime.Parse(s, CultureInfo.InvariantCulture) : default(DateTime);
+            return !String.IsNullOrEmpty(s) ? DateTime.ParseExact(s, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal) : default(DateTime);
         }
     }
 }
