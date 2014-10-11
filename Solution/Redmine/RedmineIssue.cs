@@ -28,5 +28,7 @@ namespace Redmine
         public DateTime CreationTime { get; set; }
         public DateTime LastUpdateTime { get; set; }
         public DateTime ClosingTime { get; set; }
+
+        public RedmineJournal[] Journals { get; set; }
     }
 }

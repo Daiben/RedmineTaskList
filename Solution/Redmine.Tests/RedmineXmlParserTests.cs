@@ -146,5 +146,35 @@ namespace Redmine.Tests
             Assert.AreEqual(0, issue.AssigneeId);
             Assert.AreEqual(1.5, issue.EstimatedHours);
         }
+
+
+        [Test]
+        public void ParseIssues_WithJournals()
+        {
+            var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><issue><id>1</id><project id=\"1\" name=\"Blah blah\"/><tracker id=\"1\" name=\"Bug\"/><status id=\"2\" name=\"In Progress\"/><priority id=\"2\" name=\"Normal\"/><author id=\"1\" name=\"Who Cares\"/><assigned_to id=\"1\" name=\"Who Cares\"/><subject>Parse journals</subject><description/><start_date/><due_date/><done_ratio>0</done_ratio><estimated_hours/><created_on>2014-10-03T09:45:20Z</created_on><updated_on>2014-10-03T11:34:02Z</updated_on><closed_on/><attachments type=\"array\"/><journals type=\"array\"><journal id=\"1\"><user id=\"1\" name=\"Who Cares\"/><notes>Now that's important.</notes><created_on>2014-10-03T11:34:02Z</created_on><details type=\"array\"><detail property=\"attr\" name=\"status_id\"><old_value>1</old_value><new_value>2</new_value></detail></details></journal></journals></issue>";
+
+            var issue = RedmineXmlParser.ParseIssues(xml)[0];
+
+            Assert.IsNotNull(issue.Journals);
+            Assert.AreEqual(1, issue.Journals.Length);
+
+            var journal = issue.Journals[0];
+
+            Assert.AreEqual(1, journal.Id);
+            Assert.AreEqual(1, journal.AuthorId);
+            Assert.AreEqual("Who Cares", journal.AuthorName);
+            Assert.AreEqual("Now that's important.", journal.Notes);
+            Assert.AreEqual(new DateTime(2014, 10, 3, 11, 34, 02, DateTimeKind.Utc), journal.CreationTime.ToUniversalTime());
+
+            Assert.IsNotNull(journal.Details);
+            Assert.AreEqual(1, journal.Details.Length);
+
+            var detail = journal.Details[0];
+
+            Assert.AreEqual("attr", detail.Property);
+            Assert.AreEqual("status_id", detail.Name);
+            Assert.AreEqual("1", detail.OldValue);
+            Assert.AreEqual("2", detail.NewValue);
+        }
     }
 }

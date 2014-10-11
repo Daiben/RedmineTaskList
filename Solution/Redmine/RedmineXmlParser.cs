@@ -107,10 +107,53 @@ namespace Redmine
                     CreationTime = GetDateTime(element, "created_on"),
                     LastUpdateTime = GetDateTime(element, "updated_on"),
                     ClosingTime = GetDateTime(element, "closed_on"),
+
+                    Journals = GetJournals(element),
                 });
             }
 
             return issues.ToArray();
+        }
+
+        private static RedmineJournal[] GetJournals(XElement issueElement)
+        {
+            var journals = new List<RedmineJournal>();
+            var journalsArray = issueElement.Elements("journals").FirstOrDefault() ?? new XElement("empty");
+
+            foreach (var element in journalsArray.Elements("journal"))
+            {
+                journals.Add(new RedmineJournal
+                {
+                    Id = ParseInt32(element.Attribute("id").Value),
+                    AuthorId = GetInt32(element, "user", "id"),
+                    AuthorName = GetString(element, "user", "name"),
+                    Notes = GetString(element, "notes"),
+                    CreationTime = GetDateTime(element, "created_on"),
+
+                    Details = GetJournalDetails(element),
+                });
+            }
+
+            return journals.ToArray();
+        }
+
+        private static RedmineJournalDetail[] GetJournalDetails(XElement journalElement)
+        {
+            var details = new List<RedmineJournalDetail>();
+            var detailsArray = journalElement.Elements("details").FirstOrDefault() ?? new XElement("empty");
+
+            foreach (var element in detailsArray.Elements("detail"))
+            {
+                details.Add(new RedmineJournalDetail
+                {
+                    Property = element.Attribute("property").Value,
+                    Name = element.Attribute("name").Value,
+                    OldValue = GetString(element, "old_value"),
+                    NewValue = GetString(element, "new_value"),
+                });
+            }
+
+            return details.ToArray();
         }
 
         private static string GetString(XElement element, string descendantName)
