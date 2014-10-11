@@ -84,9 +84,27 @@
                 <TextBlock Text="{Binding DoneRatio, StringFormat={}{0}%}" Margin="5,0,0,0"/>
             </WrapPanel>
         </Grid>
-        <TextBlock DockPanel.Dock="Top" Text="Description:" Margin="0,0,0,7"/>
-        <ScrollViewer Margin="15,0,0,0" VerticalScrollBarVisibility="Auto">
+        <TextBlock DockPanel.Dock="Top" Text="Description" Margin="0,0,0,7"/>
+        <ScrollViewer DockPanel.Dock="Top" MaxHeight="100" Margin="15,0,0,0" VerticalScrollBarVisibility="Auto">
             <TextBlock Text="{Binding Description, FallbackValue=-}" TextWrapping="Wrap" Padding="0,0,0,7"/>
         </ScrollViewer>
+        <TextBlock DockPanel.Dock="Top" Text="History" Margin="0,0,0,7"/>
+        <ListView ItemsSource="{Binding Journals}" BorderThickness="0" Background="Transparent" Margin="15,0,0,0" IsManipulationEnabled="False">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,0,0,15">
+                        <TextBlock FontSize="12" Margin="0,0,0,5">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}Updated by {0} on {1:dd.MM.yy}.">
+                                    <Binding Path="AuthorName"/>
+                                    <Binding Path="CreationTime"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock FontSize="12" Margin="15,0,0,0" Text="{Binding Notes}"  TextWrapping="Wrap" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </DockPanel>
 </UserControl>

@@ -10,7 +10,7 @@ namespace RedmineTaskListPackage
     public class IssueLoader
     {
         private object syncRoot;
-        private Dictionary<ConnectionSettings, RedmineIssue[]> _issues;
+        private Dictionary<ConnectionSettings, RedmineIssue[]> _issuesBySource;
         private IWebProxy _proxy;
 
         public IWebProxy Proxy
@@ -27,17 +27,39 @@ namespace RedmineTaskListPackage
             syncRoot = new object();
         }
 
-
-        public RedmineIssue[] LoadIssues(IList<ConnectionSettings> settings)
+        public static RedmineService GetRedmineService(ConnectionSettings settings, IWebProxy proxy)
         {
-            _issues = new Dictionary<ConnectionSettings, RedmineIssue[]>();
+            return new RedmineService
+            {
+                BaseUriString = settings.URL,
+                Username = settings.Username,
+                Password = settings.Password,
+                Proxy = proxy,
+            };
+        }
+
+        public LoadedRedmineIssue[] LoadIssues(IList<ConnectionSettings> settings)
+        {
+            _issuesBySource = new Dictionary<ConnectionSettings, RedmineIssue[]>();
 
             Parallel.ForEach(settings.Where(IsValid), GetIssues);
 
-            return _issues.OrderBy(x => settings.IndexOf(x.Key))
-                .SelectMany(x => x.Value)
+            return _issuesBySource.OrderBy(x => settings.IndexOf(x.Key))
+                .SelectMany(AsLoaded)
                 .Distinct(new IssueComparer())
                 .ToArray();
+        }
+
+        private static LoadedRedmineIssue[] AsLoaded(KeyValuePair<ConnectionSettings, RedmineIssue[]> source)
+        {
+            var issues = source.Value.Select(LoadedRedmineIssue.Create).ToArray();
+
+            foreach (var issue in issues)
+            {
+                issue.ConnectionSettings = source.Key;
+            }
+
+            return issues.ToArray();
         }
 
         private bool IsValid(ConnectionSettings settings)
@@ -48,14 +70,7 @@ namespace RedmineTaskListPackage
         private void GetIssues(ConnectionSettings settings)
         {
             var issues = new RedmineIssue[0];
-
-            var redmine = new RedmineService
-            {
-                BaseUriString = settings.URL,
-                Username = settings.Username,
-                Password = settings.Password,
-                Proxy = _proxy,
-            };
+            var redmine = GetRedmineService(settings, _proxy);
 
             try
             {
@@ -72,14 +87,14 @@ namespace RedmineTaskListPackage
 
             lock (syncRoot)
             {
-                _issues.Add(settings, issues);
+                _issuesBySource.Add(settings, issues);
             }
         }
 
 
-        private class IssueComparer : IEqualityComparer<RedmineIssue>
+        private class IssueComparer : IEqualityComparer<LoadedRedmineIssue>
         {
-            public bool Equals(RedmineIssue x, RedmineIssue y)
+            public bool Equals(LoadedRedmineIssue x, LoadedRedmineIssue y)
             {
                 if (Object.ReferenceEquals(x, y))
                 {
@@ -91,10 +106,10 @@ namespace RedmineTaskListPackage
                     return false;
                 }
 
-                return x.Url == y.Url;
+                return GetHashCode(x) == GetHashCode(y);
             }
 
-            public int GetHashCode(RedmineIssue issue)
+            public int GetHashCode(LoadedRedmineIssue issue)
             {
                 if (issue != null && issue.Url != null)
                 {

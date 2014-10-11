@@ -293,6 +293,12 @@ namespace RedmineTaskListPackage.ViewModel
             }
         }
 
+        public RedmineJournal[] Journals
+        {
+            get { return _issue.Journals; }
+            set { _issue.Journals = value; }
+        }
+
 
         public RedmineWebBrowser WebBrowser { get; set; }
 

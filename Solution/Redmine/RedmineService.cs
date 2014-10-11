@@ -53,6 +53,24 @@ namespace Redmine
             Proxy = WebRequest.DefaultWebProxy;
         }
 
+        public RedmineIssue GetIssueWithJournals(int id)
+        {
+            if (BaseUri == null)
+            {
+                throw new InvalidOperationException("BaseUri is not set");
+            }
+
+            var xml = GetXml("issues/" + id + ".xml?include=journals");
+            var issue = RedmineXmlParser.ParseIssues(xml).FirstOrDefault();
+
+            if (issue != null)
+            {
+                issue.Url = GetIssueUrl(issue);
+            }
+            
+            return issue;
+        }
+
         public RedmineIssue[] GetIssues(string query="assigned_to_id=me")
         {
             if (BaseUri == null)
