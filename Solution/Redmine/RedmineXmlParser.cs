@@ -193,25 +193,37 @@ namespace Redmine
 
         private static int ParseInt32(string s)
         {
-            return !String.IsNullOrEmpty(s) ? Int32.Parse(s, CultureInfo.InvariantCulture) : 0;
+            var value = 0;
+            
+            Int32.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
+
+            return value;
         }
 
         private static double ParseDouble(string s)
         {
-            return !String.IsNullOrEmpty(s) ? Double.Parse(s, CultureInfo.InvariantCulture) : 0;
+            var value = 0D;
+
+            Double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+
+            return value;
         }
 
         private static DateTime ParseDateTime(string s)
         {
-            var formats = new[]
-            {
-                "yyyy-MM-dd",
-                "yyyy-MM-ddTHH:mm:ssZ",
-                "yyyy-MM-dd HH:mm:ss UTC",
-                "yyyy-MM-dd HH:mm:ss.fff UTC",
-            };
+            var value = default(DateTime);
 
-            return !String.IsNullOrEmpty(s) ? DateTime.ParseExact(s, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal) : default(DateTime);
+            DateTime.TryParseExact(s, dateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out value);
+
+            return value;
         }
+        
+        private static string[] dateTimeFormats =
+        {
+            "yyyy-MM-dd",
+            "yyyy-MM-ddTHH:mm:ssZ",
+            "yyyy-MM-dd HH:mm:ss UTC",
+            "yyyy-MM-dd HH:mm:ss.fff UTC",
+        };
     }
 }
