@@ -207,6 +207,7 @@ namespace Redmine
             {
                 "yyyy-MM-dd",
                 "yyyy-MM-ddTHH:mm:ssZ",
+                "yyyy-MM-dd HH:mm:ss UTC",
                 "yyyy-MM-dd HH:mm:ss.fff UTC",
             };
 

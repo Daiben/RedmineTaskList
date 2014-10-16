@@ -89,7 +89,7 @@ namespace Redmine.Tests
         [Test]
         public void ParseIssues()
         {
-            var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><issues total_count=\"1\" offset=\"0\" limit=\"25\" type=\"array\"><issue><id>1</id><project id=\"2\" name=\"Redmine API Library\"/><tracker id=\"2\" name=\"Feature\"/><status id=\"3\" name=\"Resolved\"/><priority id=\"2\" name=\"Normal\"/><author id=\"1\" name=\"Dmitry Popov\"/><assigned_to id=\"1\" name=\"Dmitry Popov\"/><subject>Parse Redmine API XML</subject><description>Users, projects and issues</description><start_date>2013-06-13</start_date><due_date>2013-06-14</due_date><done_ratio>100</done_ratio><estimated_hours>2</estimated_hours><created_on>2013-06-13T22:10:24Z</created_on><updated_on>2013-06-13T22:10:24Z</updated_on><closed_on>2013-06-14 00:15:03.000 UTC</closed_on></issue></issues>";
+            var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><issues total_count=\"1\" offset=\"0\" limit=\"25\" type=\"array\"><issue><id>1</id><project id=\"2\" name=\"Redmine API Library\"/><tracker id=\"2\" name=\"Feature\"/><status id=\"3\" name=\"Resolved\"/><priority id=\"2\" name=\"Normal\"/><author id=\"1\" name=\"Dmitry Popov\"/><assigned_to id=\"1\" name=\"Dmitry Popov\"/><subject>Parse Redmine API XML</subject><description>Users, projects and issues</description><start_date>2013-06-13</start_date><due_date>2013-06-14</due_date><done_ratio>100</done_ratio><estimated_hours>2</estimated_hours><created_on>2013-06-13T22:10:24Z</created_on><updated_on>2013-06-13T22:10:24Z</updated_on><closed_on>2013-06-14T00:15:03Z</closed_on></issue></issues>";
 
             var issues = RedmineXmlParser.ParseIssues(xml);
             var issue = issues[0];
@@ -117,6 +117,18 @@ namespace Redmine.Tests
             Assert.AreEqual(new DateTime(2013, 6, 13, 22, 10, 24, DateTimeKind.Utc), issue.CreationTime.ToUniversalTime());
             Assert.AreEqual(new DateTime(2013, 6, 13, 22, 10, 24, DateTimeKind.Utc), issue.LastUpdateTime.ToUniversalTime());
             Assert.AreEqual(new DateTime(2013, 6, 14, 00, 15, 03, DateTimeKind.Utc), issue.ClosingTime.ToUniversalTime());
+        }
+
+        [Test]
+        public void ParseIssues_DateTimeFormats()
+        {
+            var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><issues total_count=\"5\" offset=\"0\" limit=\"3\" type=\"array\"><issue><id>1</id><project id=\"1\" name=\"Project\"/><tracker id=\"1\" name=\"Bug\"/><status id=\"1\" name=\"New\"/><priority id=\"2\" name=\"Normal\"/><author id=\"1\" name=\"User\"/><assigned_to id=\"1\" name=\"User\"/><subject>ISO 8601 DateTime Format</subject><description></description><start_date></start_date><done_ratio></done_ratio><estimated_hours></estimated_hours><created_on>2014-10-16T21:51:00Z</created_on><updated_on></updated_on><closed_on></closed_on></issue><issue><id>2</id><project id=\"1\" name=\"Project\"/><tracker id=\"1\" name=\"Bug\"/><status id=\"1\" name=\"New\"/><priority id=\"2\" name=\"Normal\"/><author id=\"1\" name=\"User\"/><assigned_to id=\"1\" name=\"User\"/><subject>Weird UTC Format 1</subject><description></description><start_date></start_date><done_ratio></done_ratio><estimated_hours></estimated_hours><created_on>2014-10-16 21:51:01.000 UTC</created_on><updated_on></updated_on><closed_on></closed_on></issue><issue><id>3</id><project id=\"1\" name=\"Project\"/><tracker id=\"1\" name=\"Bug\"/><status id=\"1\" name=\"New\"/><priority id=\"2\" name=\"Normal\"/><author id=\"1\" name=\"User\"/><assigned_to id=\"1\" name=\"User\"/><subject>Weird UTC Format 2</subject><description></description><start_date></start_date><done_ratio></done_ratio><estimated_hours></estimated_hours><created_on>2014-10-16 21:51:02 UTC</created_on><updated_on></updated_on><closed_on></closed_on></issue></issues>";
+
+            var issues = RedmineXmlParser.ParseIssues(xml);
+            
+            Assert.AreEqual(new DateTime(2014, 10, 16, 21, 51, 00, DateTimeKind.Utc), issues[0].CreationTime.ToUniversalTime());
+            Assert.AreEqual(new DateTime(2014, 10, 16, 21, 51, 01, DateTimeKind.Utc), issues[1].CreationTime.ToUniversalTime());
+            Assert.AreEqual(new DateTime(2014, 10, 16, 21, 51, 02, DateTimeKind.Utc), issues[2].CreationTime.ToUniversalTime());
         }
 
         [Test]
