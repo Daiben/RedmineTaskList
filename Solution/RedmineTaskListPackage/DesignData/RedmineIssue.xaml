@@ -1,30 +1,9 @@
-﻿<local:RedmineIssueViewModel xmlns:local="clr-namespace:RedmineTaskListPackage.ViewModel" 
+﻿<local:RedmineIssueViewModel xmlns:local="clr-namespace:RedmineTaskListPackage.ViewModel"
     AssigneeId = "1"
     AssigneeName = "Dmitry Popov"
     AuthorId = "1"
     AuthorName = "Dmitry Popov"
-    Description = "Background 
-Cider and Blend 4
-
-Developers using a visual Designer use sample data to light up their UI at design-time; to cause the Designer to render like it will at run-time. This time saving feature is especially important when designing DataTemplates or adjusting the layout of a DataGrid since the developer will not have to actually run the application to see what it will render like with data.
-
-Sample data in Cider and Blend is easy to understand and wire up.
-
-Sample data files are XAML files. Each sample data file contains one or more instances of user type's instantiated in XAML. The XAML sample data file and resulting instances of data are connected to the UI using the d:DesignData MarkupExtension. d:DesignData can be applied to a data source declared in XAML like a CollectionViewSource, DomainDataSource or can be assigned to a d:DataContext property.
-
-Each sample data file has an associated Build Action that determines if d:DesignData will create actual instances of the types in the sample data file or if faux types will be created. Faux types are necessary when the types in the sample data file are not creatable or if read-only properties need to be populated with sample data values.
-Blend 4
-
-Blend has tooling to create and modify XAML sample data for a class. Blend also provides a sample data drag and drop experience to wire up the d:DataContext and appropriate properties.
-
-Blend provides an additional feature that enables creating XML sample data on the fly without a predefined class. The XML sample data can then be easily be configured and modified. This XML sample data only works in Blend.
-
-To learn more about Blend please see the Expression Blend Blog, Unni's Blog, Kirupa's Blog or Christian Schormann's Blog.
-Faux Types and Real Types 
-
-The term faux type is used in this document to indicate that a cloned type will be created instead of your actual type. Benefits of faux types include the ability to create an otherwise non-creatable type in sample data, the ability to set read-only properties in sample data and the by-passing of code in the real type's constructor.
-
-When using real types in sample data, be aware that any code in the type's constructor will be executed at design-time. For an entity object this would not normally be an issue, but if the real type is a ViewModel, the code in that ViewModel's constructor will be executed. If that constructor's code loads data from a database for example, problems could occur in the Designer when the sample data is loaded. User code running at design-time is responsible for over 20% of all Designer load failures. You can read up on running code in a constructor in this blog post. "
+    Description = "Just a few words. Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
     DoneRatio = "100"
     EstimatedHours = "2"
     Id = "10"
@@ -36,5 +15,28 @@ When using real types in sample data, be aware that any code in the type's const
     StatusName = "Resolved"
     Subject = "Design-time Sample Data"
     TrackerId = "1"
-    TrackerName = "Feature"
-/>
+    TrackerName = "Feature">
+    <local:RedmineIssueViewModel.Journals>
+        <local:RedmineJournalViewModel
+            Id = "1"
+            AuthorId = "1"
+            AuthorName = "Dmitry Popov"
+            CreationTime = "2014-10-16T19:08:40Z"
+            Notes = "One short note"
+            />
+        <local:RedmineJournalViewModel
+            Id = "2"
+            AuthorId = "1"
+            AuthorName = "Dmitry Popov"
+            CreationTime = "2014-10-16T19:11:23Z"
+            Notes = "And another one"
+            />
+        <local:RedmineJournalViewModel
+            Id = "2"
+            AuthorId = "1"
+            AuthorName = "Dmitry Popov"
+            CreationTime = "2014-10-16T19:11:23Z"
+            Notes = "And one more"
+            />
+    </local:RedmineIssueViewModel.Journals>
+</local:RedmineIssueViewModel>

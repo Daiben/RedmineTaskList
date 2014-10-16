@@ -120,6 +120,7 @@
     </Compile>
     <Compile Include="ProxyOptions.cs" />
     <Compile Include="ViewModel\EnvironmentColors.cs" />
+    <Compile Include="ViewModel\RedmineJournalViewModel.cs" />
     <Compile Include="WebBrowser.cs" />
     <Compile Include="Tree\RedmineProjectTreeNodeCollection.cs" />
     <Compile Include="Tree\RedmineProjectTreeNode.cs" />

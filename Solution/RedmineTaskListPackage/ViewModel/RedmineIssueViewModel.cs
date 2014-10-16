@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Redmine;
 
 namespace RedmineTaskListPackage.ViewModel
@@ -6,6 +7,7 @@ namespace RedmineTaskListPackage.ViewModel
     public class RedmineIssueViewModel : ObservableObject
     {
         private RedmineIssue _issue;
+        private RedmineJournalViewModel[] _journals;
 
         public int AssigneeId
         {
@@ -293,10 +295,10 @@ namespace RedmineTaskListPackage.ViewModel
             }
         }
 
-        public RedmineJournal[] Journals
+        public RedmineJournalViewModel[] Journals
         {
-            get { return _issue.Journals; }
-            set { _issue.Journals = value; }
+            get { return _journals; }
+            set { _journals = value; }
         }
 
 
@@ -321,6 +323,9 @@ namespace RedmineTaskListPackage.ViewModel
             }
 
             _issue = issue;
+            _journals = issue.Journals != null 
+                ? issue.Journals.Select(x => new RedmineJournalViewModel(x)).ToArray()
+                : new RedmineJournalViewModel[0];
         }
 
         public void OpenInBrowser()
