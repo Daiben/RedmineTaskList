@@ -16,6 +16,7 @@
             <Setter Property="Control.Background" Value="{DynamicResource {x:Static local:EnvironmentColors.ToolWindowBackgroundBrushKey}}"/>
             <Setter Property="Control.FontSize" Value="14"/>
         </Style>
+        <local:DateTimeToElapsedConverter x:Key="ElapsedConverter" />
     </UserControl.Resources>
 
     <UserControl.Style>
@@ -42,15 +43,27 @@
                 </Run>
         </TextBlock>
 
-        <TextBlock DockPanel.Dock="Top" Margin="0,0,0,15" TextTrimming="WordEllipsis">
-            <TextBlock.Text>
-                <MultiBinding  StringFormat="{}Created by {0} on {1:dd.MM.yy}. Updated on {2:dd.MM.yy}.">
-                    <Binding Path="AuthorName"/>
-                    <Binding Path="CreationTime"/>
-                    <Binding Path="LastUpdateTime"/>
-                </MultiBinding>
-            </TextBlock.Text>
-        </TextBlock>
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,15">
+            <TextBlock TextTrimming="WordEllipsis">
+                <TextBlock.ToolTip>
+                    <ToolTip Content="{Binding CreationTime}" ContentStringFormat="dd.MM.yy HH:mm:ss" />
+                </TextBlock.ToolTip>
+                <TextBlock.Text>
+                    <MultiBinding  StringFormat="{}Created by {0} {1}. ">
+                        <Binding Path="AuthorName"/>
+                        <Binding Path="CreationTime" Converter="{StaticResource ElapsedConverter}"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <TextBlock TextTrimming="WordEllipsis">
+                <TextBlock.ToolTip>
+                    <ToolTip Content="{Binding LastUpdateTime}" ContentStringFormat="dd.MM.yy HH:mm:ss" />
+                </TextBlock.ToolTip>
+                <TextBlock.Text>
+                    <Binding Path="LastUpdateTime" StringFormat="Updated {0}." Converter="{StaticResource ElapsedConverter}" />
+                </TextBlock.Text>
+            </TextBlock>
+        </WrapPanel>
 
         <Grid DockPanel.Dock="Top" Margin="0,0,0,15" MinWidth="450">
             <Grid.ColumnDefinitions>
@@ -95,10 +108,13 @@
                         <DataTemplate>
                             <StackPanel Margin="0,0,0,15">
                                 <TextBlock FontSize="12" Padding="0,0,15,0" Margin="0,0,0,5">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip Content="{Binding CreationTime}" ContentStringFormat="dd.MM.yy HH:mm:ss" />
+                                    </TextBlock.ToolTip>
                                     <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}Updated by {0} on {1:dd.MM.yy}.">
+                                        <MultiBinding StringFormat="{}{0} wrote {1}:">
                                             <Binding Path="AuthorName"/>
-                                            <Binding Path="CreationTime"/>
+                                            <Binding Path="CreationTime" Converter="{StaticResource ElapsedConverter}"/>
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>

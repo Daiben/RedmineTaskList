@@ -15,7 +15,9 @@
     StatusName = "Resolved"
     Subject = "Design-time Sample Data"
     TrackerId = "1"
-    TrackerName = "Feature">
+    TrackerName = "Feature"
+    CreationTime="2014-10-10T16:40:32Z"
+    LastUpdateTime="2014-10-16T19:11:23Z">
     <local:RedmineIssueViewModel.Journals>
         <local:RedmineJournalViewModel
             Id = "1"
