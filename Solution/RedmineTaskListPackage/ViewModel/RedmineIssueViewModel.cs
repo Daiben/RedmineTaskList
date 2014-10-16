@@ -323,9 +323,11 @@ namespace RedmineTaskListPackage.ViewModel
             }
 
             _issue = issue;
-            _journals = issue.Journals != null 
-                ? issue.Journals.Select(x => new RedmineJournalViewModel(x)).ToArray()
-                : new RedmineJournalViewModel[0];
+            _journals = issue.Journals == null 
+                ? new RedmineJournalViewModel[0]
+                : issue.Journals
+                    .Where(x => x.Notes != null && x.Notes.Length > 0)
+                    .Select(x => new RedmineJournalViewModel(x)).ToArray();
         }
 
         public void OpenInBrowser()
