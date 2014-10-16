@@ -103,7 +103,9 @@
                 <TextBlock DockPanel.Dock="Top" Text="Description" Margin="0,0,0,7"/>
                 <TextBlock Text="{Binding Description, FallbackValue=-}" Margin="15,0,0,0" TextWrapping="Wrap" Padding="0,0,15,7"/>
                 <TextBlock DockPanel.Dock="Top" Text="History" Margin="0,0,0,7"/>
-                <ListView ItemsSource="{Binding Journals}" BorderThickness="0" Background="Transparent" Margin="15,0,0,0" IsManipulationEnabled="False">
+                <ListView ItemsSource="{Binding Journals}"
+                          Background="Transparent" BorderThickness="0" Margin="15,0,0,0"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="0,0,0,15">
