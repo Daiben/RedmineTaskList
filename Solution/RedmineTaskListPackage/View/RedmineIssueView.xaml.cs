@@ -15,6 +15,8 @@ namespace RedmineTaskListPackage.View
             {
                 _issue = value;
                 DataContext = value;
+
+                DetailsScrollViewer.ScrollToTop();
             }
         }
 
