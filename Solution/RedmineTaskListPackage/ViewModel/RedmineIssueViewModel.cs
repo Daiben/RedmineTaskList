@@ -100,6 +100,11 @@ namespace RedmineTaskListPackage.ViewModel
             }
         }
 
+        public bool DescriptionVisible
+        {
+            get { return !String.IsNullOrWhiteSpace(_issue.Description); }
+        }
+
         public int DoneRatio
         {
             get { return _issue.DoneRatio; }
@@ -299,6 +304,11 @@ namespace RedmineTaskListPackage.ViewModel
         {
             get { return _journals; }
             set { _journals = value; }
+        }
+
+        public bool JournalsVisible
+        {
+            get { return _journals.Length > 0; }
         }
 
 
