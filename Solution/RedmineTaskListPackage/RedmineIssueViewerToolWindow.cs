@@ -29,7 +29,10 @@ namespace RedmineTaskListPackage
         
         public void Show(RedmineIssueViewModel issue)
         {
+            Caption = "Issue #" + issue.Id;
+            
             issueViewer.Issue = issue;
+
             Show();
         }
     }
